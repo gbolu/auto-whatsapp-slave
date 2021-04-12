@@ -5,7 +5,7 @@ import selenium.webdriver.support.expected_conditions as EC
 import time
 import sys
 
-def testClick(user_profile_path="", phone_number="2348100415220", message=""):
+def testClick(user_profile_path="", phone_number="2348100415220", message="", executable_path="chromedriver"):
     options = webdriver.ChromeOptions()
     options.add_argument(user_profile_path)
     options.add_argument("--window-size=1920,1080")
@@ -22,7 +22,7 @@ def testClick(user_profile_path="", phone_number="2348100415220", message=""):
     options.add_argument('--no-sandbox')
     options.add_argument('--ignore-certificate-errors')
     driver = webdriver.Chrome(
-    executable_path="chromedriver", options=options)
+    executable_path=executable_path, options=options)
 
     driver.get("https://web.whatsapp.com/send?phone={}".format(phone_number))
     time.sleep(30)
