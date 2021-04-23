@@ -1,3 +1,7 @@
 .vscode/
 __pycache__/
 node_modules/
+chrome-data/
+chrome-user-data/
+chromedriver
+yarn.lock

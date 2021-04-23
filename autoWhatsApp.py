@@ -32,5 +32,5 @@ def testClick(user_profile_path="", phone_number="2348100415220", message="", ex
     driver.quit()
 
 if __name__ == '__main__':
-    testClick("user-data-dir=C:\\Users\\Gbolu\\AppData\\Local\\Google\\Chrome\\User Data\\", 
+    testClick("user-data-dir=/home/gbolu/.config/chromium", 
         phone_number=sys.argv[1], message=sys.argv[2])
