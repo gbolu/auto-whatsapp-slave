@@ -2,7 +2,7 @@ import subprocess as subprocess
 import sys
 
 def closeChrome(target_process):
-    temp_subprocess = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+    temp_subprocess = subprocess.Popen(['ps', '-aux'], stdout=subprocess.PIPE)
     output, error = temp_subprocess.communicate()
 
     for line in output.splitlines():
