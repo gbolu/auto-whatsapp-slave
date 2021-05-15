@@ -5,3 +5,7 @@ chrome-data/
 chrome-user-data/
 chromedriver
 yarn.lock
+npm-debug.log
+debug.log
+images/
+

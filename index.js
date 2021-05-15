@@ -4,6 +4,7 @@ const sendMessage = require('./sendMessage');
 app.use(express.json());
 
 app.post('/', async (req, res, next) => {
+    console.log("Request recieved.");
     if(!req.body.message || !req.body.phone_number){
         return res.status(400).json({
             code: res.statusCode,
@@ -32,6 +33,6 @@ app.post('/', async (req, res, next) => {
     })
 })
 
-app.listen(5000, () => {
+app.listen(80, () => {
     console.log('Server is listening...')
 })
