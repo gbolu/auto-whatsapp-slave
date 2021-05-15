@@ -7,7 +7,7 @@ def closeChrome(target_process):
 
     for line in output.splitlines():
         if target_process in str(line):
-            pid = (line.split(' ', 1)[0])
+            pid = (str(line).split(' ', 1)[1])
             print(pid)
 
 if __name__ == "__main__":
