@@ -13,6 +13,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-extensions")
     options.add_argument("--remote-debugging-port=9222")
+    options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2}) 
     options.add_argument("--proxy-server='direct://'")
     options.add_argument("--proxy-bypass-list=*")
     options.add_argument("--start-maximized")
