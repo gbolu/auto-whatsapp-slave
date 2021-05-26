@@ -1,6 +1,6 @@
 const express = require('express');
+const whatsappQueue = require('../queueMaster');
 const app = express();
-const sendMessage = require('./sendMessage');
 app.use(express.json());
 
 app.post('/', async (req, res, next) => {
@@ -14,14 +14,10 @@ app.post('/', async (req, res, next) => {
         })
     }
 
-    const {message, phone_number} = req.body;
+    const {message_id, message, phone_number} = req.body;
 
-    try {
-        (await sendMessage(message, phone_number))   
-    } catch (error) {
-        console.log(error)
-        return res.status(400).end();   
-    }
+    whatsappQueue.add({id, message, phone_number}, {attempts: 2})
+
     return res.status(200).json({
         code: res.statusCode,
         message: `Message sent successfully to ${phone_number}`,

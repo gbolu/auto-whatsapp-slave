@@ -5,7 +5,7 @@ import selenium.webdriver.support.expected_conditions as EC
 import time
 import sys
 
-def testClick(user_profile_path, phone_number='2348100415220', message='', executable_path="/home/gboluwagaadeyemi/code_files/auto-whatsapp-omc/chromedriver"):
+def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', executable_path="/home/gboluwagaadeyemi/code_files/auto-whatsapp-omc/chromedriver"):
     options = webdriver.ChromeOptions()
     options.add_argument(user_profile_path)
     options.add_argument("--window-size=1920,1080")
@@ -32,5 +32,5 @@ def testClick(user_profile_path, phone_number='2348100415220', message='', execu
     driver.quit()
 
 if __name__ == '__main__':
-    testClick("user-data-dir=/home/gboluwagaadeyemi/code_files/auto-whatsapp-omc/chrome-data/chromium/", 
+    autoWhatsApp("user-data-dir=/home/gboluwagaadeyemi/code_files/auto-whatsapp-omc/chrome-data/chromium/", 
         phone_number=sys.argv[1], message=sys.argv[2])
