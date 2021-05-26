@@ -12,6 +12,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     options.add_argument(user_profile_path)
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-extensions")
+    options.add_argument("--remote-debugging-port=9222")
     options.add_argument("--proxy-server='direct://'")
     options.add_argument("--proxy-bypass-list=*")
     options.add_argument("--start-maximized")
@@ -19,8 +20,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('user-agent=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36')
-    # options.add_argument('--allow-running-insecure-content')
-    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--allow-running-insecure-content')
     options.add_argument('--ignore-certificate-errors')
     driver = webdriver.Chrome(
     executable_path=executable_path, options=options)
