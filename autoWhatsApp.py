@@ -32,5 +32,5 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     driver.quit()
 
 if __name__ == '__main__':
-    autoWhatsApp("user-data-dir=/home/gboluwagaadeyemi/code_files/auto_whatsapp/chromium", 
+    autoWhatsApp("user-data-dir=/home/gboluwagaadeyemi/code_files/auto_whatsapp/user-data", 
         phone_number=sys.argv[1], message=sys.argv[2])
