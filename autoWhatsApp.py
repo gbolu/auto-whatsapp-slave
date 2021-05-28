@@ -8,12 +8,10 @@ import sys
 def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', executable_path="/home/gboluwagaadeyemi/code_files/auto_whatsapp/chromedriver"):
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-using')
-    # options.add_argument(user_profile_path)
+    options.binary_location = "/usr/bin/google-chrome-stable"
+    options.add_argument(user_profile_path)
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--disable-extensions")
-    options.add_argument("--remote-debugging-port=9222")
-    options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2}) 
     options.add_argument("--proxy-server='direct://'")
     options.add_argument("--proxy-bypass-list=*")
     options.add_argument("--start-maximized")
