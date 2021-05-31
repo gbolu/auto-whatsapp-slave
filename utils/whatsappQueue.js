@@ -18,7 +18,7 @@ whatsappQueue.process(async(job) =>
         } catch (error) {
             console.log(error)
             if(job.attemptsMade === 2){
-              whatsappQueue.add(job.data, {attempts: 2});
+              await whatsappQueue.add(job.data, {attempts: 2});
             }
             reject(error);
         }
