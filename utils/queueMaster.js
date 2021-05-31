@@ -4,8 +4,7 @@ require('dotenv').config();
 const axios = require('axios').default;
 
 const whatsappQueue = new Queue("whatsapp", {
-  redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
-  limiter: {},
+  redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" }
 });
 
 whatsappQueue.process(async(job) => 
