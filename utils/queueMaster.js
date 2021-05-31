@@ -9,7 +9,7 @@ const whatsappQueue = new Queue("whatsapp", {
 });
 
 whatsappQueue.process(async(job) => 
-    new Promise((resolve, reject) => {
+    new Promise(async(resolve, reject) => {
         const { id, message, phone_number } = job.data;
 
         try {
