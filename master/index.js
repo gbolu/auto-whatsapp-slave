@@ -15,7 +15,12 @@ app.post('/', async (req, res) => {
 
     const {id, message, phone_number} = req.body;
 
-    whatsappQueue.add({id, message, phone_number}, {attempts: 2});
+    try {
+      await whatsappQueue.add({id, message, phone_number}, {attempts: 2});
+    } catch (error) {
+      console.log(error);
+      return res.status(500).end();
+    }
 
     return res.status(200).json({
       code: res.statusCode,
