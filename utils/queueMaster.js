@@ -1,5 +1,5 @@
 const Queue = require('bull');
-const sendMessage = require('./utils/sendMessage');
+const sendMessage = require('./sendMessage');
 require('dotenv').config();
 const axios = require('axios').default;
 
@@ -8,8 +8,8 @@ const whatsappQueue = new Queue("whatsapp", {
   limiter: {},
 });
 
-whatsappQueue.process(async(job) => {
-    return new Promise((resolve, reject) => {
+whatsappQueue.process(async(job) => 
+    new Promise((resolve, reject) => {
         const { id, message, phone_number } = job.data;
 
         try {
@@ -24,6 +24,6 @@ whatsappQueue.process(async(job) => {
             reject(error);
         }
     })
-});
+);
 
 module.exports = whatsappQueue;
