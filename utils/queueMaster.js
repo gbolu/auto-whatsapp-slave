@@ -14,16 +14,23 @@ whatsappQueue.process(async(job) =>
 
         try {
             await sendMessage(message, phone_number);
-            await axios.get(process.env.SUCCESS_URL, {
-                data: {
-                    id, status: 'success'
-                }
-            });
-            resolve(true);
         } catch (error) {
             console.log(error)
             reject(error);
         }
+        
+        try {
+            await axios.get(process.env.SUCCESS_URL, {
+              data: {
+                id,
+                status: "success",
+              },
+            });
+        } catch (error) {
+            console.log(error);
+        }
+
+        resolve(true);
     })
 );
 
