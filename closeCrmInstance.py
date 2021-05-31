@@ -15,7 +15,8 @@ def findProcessPid(target_process):
             return int(pid)
 
 def closeProcess(pid):
-    os.kill(pid, 9)
+    if pid is not None:
+        os.kill(pid, 9)
 
 if __name__ == "__main__":
     target_process = sys.argv[1]
