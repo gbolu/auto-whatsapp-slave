@@ -9,6 +9,7 @@ const whatsappQueue = new Queue("whatsapp", {
 
 whatsappQueue.process(async(job) => 
     new Promise(async(resolve, reject) => {
+        console.log('Request recieved...')
         const { id, message, phone_number } = job.data;
 
         try {
@@ -20,6 +21,7 @@ whatsappQueue.process(async(job) =>
             });
             resolve(true);
         } catch (error) {
+            console.log(error)
             reject(error);
         }
     })
