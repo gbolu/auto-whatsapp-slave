@@ -1,5 +1,5 @@
 const express = require('express');
-const whatsappQueue = require('../utils/queueMaster');
+const whatsappQueue = require('../utils/whatsappQueue');
 const app = express();
 app.use(express.json());
 

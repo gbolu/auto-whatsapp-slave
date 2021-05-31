@@ -14,7 +14,7 @@ const sendMessage = async (message, phone_number) => {
       if (stderr) throw stderr;
       else resolve(true);
     } catch (error) {
-      // console.error("stderr:", error);
+      console.error("stderr:", error);
       reject(error.message);
     }
   });
