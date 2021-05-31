@@ -7,7 +7,7 @@ const sendMessage = async (message, phone_number) => {
       const whatsappMsgBotPath =
         "autoWhatsApp.py";
       const { stdout, stderr } = await exec(
-        `python3 "${whatsappMsgBotPath}" ${phone_number} "${message}"`
+        `sudo python3 "${whatsappMsgBotPath}" ${phone_number} "${message}"`
       );
 
       if(stdout) console.log(stdout);
