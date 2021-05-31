@@ -34,6 +34,6 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     # close any lingering processes 
 
 if __name__ == '__main__':
-    autoWhatsApp("user-data-dir=/home/gboluwagaadeyemi/code_files/auto_whatsapp/user-data", 
+    autoWhatsApp("--user-data-dir=/home/gboluwagaadeyemi/code_files/auto_whatsapp/user-data", 
         phone_number=sys.argv[1], message=sys.argv[2])
     closeProcess(findProcessPid("chrome"))
