@@ -8,29 +8,28 @@ const whatsappQueue = new Queue("whatsapp", {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" }
 });
 
-whatsappQueue.process(async(job) => 
-    new Promise(async(resolve, reject) => {
-        console.log('Request recieved...')
-        const { id, message, phone_number } = job.data;
+whatsappQueue.process(async (job) => {
+    console.log('Request recieved');
+    console.log((await job.isActive()))
+    const { id, message, phone_number } = job.data;
 
-        try {
-            await sendMessage(message, phone_number);
-        } catch (error) {
-            console.log(error)
-            if(job.attemptsMade === 2){
-              await whatsappQueue.add(job.data, {attempts: 2});
-            }
-            reject(error);
+    try {
+        await sendMessage(message, phone_number);
+    } catch (error) {
+        console.log(error)
+        if(job.attemptsMade === 2){
+          await whatsappQueue.add(job.data, {attempts: 2});
         }
-        
-        try {
-          await successQueue.add({id}, {attempts: 3});
-        } catch (error) {
-            console.log("Error sending status message.");
-        }
-
-        resolve(true);
-    })
+        return Promise.reject(error);
+    }
+    
+    try {
+      await successQueue.add({id}, {attempts: 3});
+    } catch (error) {
+        console.log("Error sending status message.");
+    }
+    return Promise.resolve(true);
+  }
 );
 
 module.exports = whatsappQueue;
