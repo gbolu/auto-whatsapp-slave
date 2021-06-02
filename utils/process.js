@@ -1,8 +1,6 @@
 const sendMessage = require("./sendMessage");
 
 const processor = async (job) => {
-  job.lockKey();
-  await job.takeLock();
   const { id, message, phone_number } = job.data;
 
   try {
@@ -20,7 +18,6 @@ const processor = async (job) => {
   } catch (error) {
       console.log("Error sending status message.");
   }
-  await job.releaseLock();
   return Promise.resolve(true);
 };
 
