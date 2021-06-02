@@ -20,7 +20,7 @@ const processor = async (job) => {
   } catch (error) {
       console.log("Error sending status message.");
   }
-  job.releaseLock();
+  await job.releaseLock();
   return Promise.resolve(true);
 };
 
