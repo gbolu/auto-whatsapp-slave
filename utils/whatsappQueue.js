@@ -10,7 +10,6 @@ const whatsappQueue = new Queue("whatsapp", {
 
 whatsappQueue.process(async (job) => {
     console.log('Request recieved');
-    console.log((await job.isActive()))
     const { id, message, phone_number } = job.data;
 
     try {
