@@ -9,3 +9,4 @@ npm-debug.log
 debug.log
 images/
 .env
+user-data/

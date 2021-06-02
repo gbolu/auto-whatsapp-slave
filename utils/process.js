@@ -1,7 +1,6 @@
 const sendMessage = require("./sendMessage");
 
-const processor = async (val = 1, job) => {
-  console.log("Request recieved" + job.id);
+const processor = async (job) => {
   job.lockKey();
   await job.takeLock();
   const { id, message, phone_number } = job.data;
