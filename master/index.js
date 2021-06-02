@@ -36,7 +36,7 @@ app.post('/', async (req, res) => {
 const clean = (status) => {
   whatsappQueue
     .clean(1000, status)
-    .then((res) => console.log("WhatsApp Queue Cleaned!"))
+    .then()
     .catch((err) => console.error);
 }
 app.listen(process.env.PORT || 80, () => {
@@ -44,4 +44,5 @@ app.listen(process.env.PORT || 80, () => {
   clean("wait");
   clean("delayed");
   clean("completed");
+  clean("active")
 })
