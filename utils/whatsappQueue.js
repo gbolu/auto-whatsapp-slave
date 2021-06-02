@@ -10,23 +10,23 @@ const whatsappQueue = new Queue("whatsapp", {
 
 whatsappQueue.process(async (job) => {
     console.log('Request recieved');
-    const { id, message, phone_number } = job.data;
+    // const { id, message, phone_number } = job.data;
 
-    try {
-        await sendMessage(message, phone_number);
-    } catch (error) {
-        console.log(error)
-        if(job.attemptsMade === 2){
-          await whatsappQueue.add(job.data, {attempts: 2});
-        }
-        return Promise.reject(error);
-    }
+    // try {
+    //     await sendMessage(message, phone_number);
+    // } catch (error) {
+    //     console.log(error)
+    //     if(job.attemptsMade === 2){
+    //       await whatsappQueue.add(job.data, {attempts: 2});
+    //     }
+    //     return Promise.reject(error);
+    // }
     
-    try {
-      await successQueue.add({id}, {attempts: 3});
-    } catch (error) {
-        console.log("Error sending status message.");
-    }
+    // try {
+    //   await successQueue.add({id}, {attempts: 3});
+    // } catch (error) {
+    //     console.log("Error sending status message.");
+    // }
     return Promise.resolve(true);
   }
 );
