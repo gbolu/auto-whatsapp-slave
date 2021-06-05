@@ -45,7 +45,7 @@ activeQueues.forEach((handler) => {
 
       await queue.add(job.data, {delay: 20000});
     } catch (error) {
-      console.log("There was an error on failed!")
+      console.log(error.message)
     }
     // console.log(err);
   });
