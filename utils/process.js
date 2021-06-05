@@ -1,24 +1,21 @@
 const sendMessage = require("./sendMessage");
 
-const processor = async (job) => {
+const processor = async job => {
   const { id, message, phone_number } = job.data;
 
   try {
-      await sendMessage(message, phone_number);
+    await sendMessage(message, phone_number);
   } catch (error) {
-      console.log(error)
-      if(job.attemptsMade === 2){
-        await whatsappQueue.add(job.data, {attempts: 2});
-      }
-      return Promise.reject(error);
+    return Promise.reject(error);
   }
 
   try {
     await successQueue.add({id}, {attempts: 3});
   } catch (error) {
-      console.log("Error sending status message.");
+    console.log("Error sending status message.");
   }
-  return Promise.resolve(true);
+
+  return Promise.resolve();
 };
 
 module.exports = processor;

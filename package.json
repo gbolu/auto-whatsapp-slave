@@ -4,8 +4,8 @@
   "description": "Programatically queue WhatsApp messages to be sent to clients.",
   "main": "index.js",
   "scripts": {
-    "start": "node master/index.js",
-    "dev": "nodemon master/index.js"
+    "start": "node --trace-warnings master/index.js",
+    "dev": "nodemon --trace-warnings master/index.js"
   },
   "keywords": [
     "whatsapp",

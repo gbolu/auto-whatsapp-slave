@@ -16,9 +16,9 @@ app.post('/', async (req, res) => {
     const {id, message, phone_number} = req.body;
 
     try {
-      await whatsappQueue.add({id, message, phone_number}, {attempts: 2});
+      await whatsappQueue.add({id, message, phone_number});
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return res.status(500).end();
     }
 
@@ -33,16 +33,14 @@ app.post('/', async (req, res) => {
     });
 })
 
-const clean = (status) => {
-  whatsappQueue
-    .clean(1000, status)
-    .then()
-    .catch((err) => console.error);
+const clean = async () => {
+  await Promise.all([whatsappQueue.empty(), 
+  whatsappQueue.clean(10, "active"), 
+  whatsappQueue.clean(10, "completed"),
+  whatsappQueue.clean(10, "wait"), 
+  whatsappQueue.clean(10, "failed")]);
 }
 app.listen(process.env.PORT || 80, () => {
   console.log('Server is listening...');
-  clean("wait");
-  clean("delayed");
-  clean("completed");
-  clean("active")
+  clean().then(() => console.log("Cleaned!"));
 })

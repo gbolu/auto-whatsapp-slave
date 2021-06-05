@@ -1,22 +1,14 @@
 const Queue = require('bull');
-const sendMessage = require('./sendMessage');
 require('dotenv').config();
-const axios = require('axios').default;
-const successQueue = require('./successQueue');
 const processor = require('./process');
 
 const whatsappQueue = new Queue("whatsapp", {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
-  defaultJobOptions: {
-    attempts: 2,
-    removeOnComplete: true,
-    removeOnFail: false,
-  },
   settings: {
     drainDelay: 10,
-    lockRenewTime: 10,
-    retryProcessDelay: 100,
-    guardInterval: 100
+    guardInterval: 100,
+    stalledInterval: 100,
+    maxStalledCount: 0
   }
 });
 
@@ -27,37 +19,6 @@ const EventEmitter = require("events");
 EventEmitter.defaultMaxListeners = 50;
 
 const logger = require("./logger");
-
-const handleFailure = (job, err) => {
-  if (job.attemptsMade >= job.opts.attempts) {
-    logger.info(
-      `Job failures above threshold in ${job.queue.name} for: ${JSON.stringify(
-        job.data
-      )}`,
-      err
-    );
-    job.remove();
-    return null;
-  }
-  logger.info(
-    `Job in ${job.queue.name} failed for: ${JSON.stringify(job.data)} with ${
-      err.message
-    }. ${job.opts.attempts - job.attemptsMade} attempts left`
-  );
-};
-
-const handleCompleted = job => {
-  logger.info(
-    `Job in ${job.queue.name} completed for: ${JSON.stringify(job.data)}`
-  );
-  job.remove();
-};
-
-const handleStalled = job => {
-  logger.info(
-    `Job in ${job.queue.name} stalled for: ${JSON.stringify(job.data)}`
-  );
-};
 
 const activeQueues = [
   {
@@ -70,17 +31,64 @@ activeQueues.forEach((handler) => {
   const queue = handler.queue;
   const processor = handler.processor;
 
-  const failHandler = handler.failHandler || handleFailure;
-  const completedHandler = handler.completedHandler || handleCompleted;
+  // const failHandler = handler.failHandler || handleFailure;
+  // const completedHandler = handler.completedHandler || handleCompleted;
 
   // here are samples of listener events : "failed","completed","stalled", the other events will be ignored
-  queue.on("failed", failHandler);
-  queue.on("completed", completedHandler);
-  queue.on("error", (err) => {logger.error(err.message)});
-  queue.on("waiting", (job) => {
-    console.log("Waiting at the moment on job: " + job);
+  queue.on("failed", async(job, err) => {
+    try {
+      logger.error(err);
+      await queue.removeJobs(job.id);
+      
+      if(await queue.isPaused())
+      await queue.resume()
+
+      await queue.add(job.data, {delay: 20000});
+    } catch (error) {
+      console.log("There was an error on failed!")
+    }
+    // console.log(err);
   });
-  queue.on("global:resumed", () => console.log("Whatsapp Queue has resumed"));
+
+  queue.on("completed", async (job) => {
+    logger.info(
+      `Job: ${job.id} completed.`
+    );
+    await job.remove();
+
+    if(await queue.isPaused())
+    await queue.resume();
+  });
+
+  queue.on("stalled", async(job) => {
+    console.log(`Whatsapp Queue is stalled on job: ${job.id}`);
+    
+    if(!await job.isActive())
+    await job.remove();
+
+    if(await queue.isPaused())
+    await queue.resume();
+  })
+
+  queue.on("waiting", async (job) => {
+    console.log("Waiting at the moment on job: " + job);
+    if(await queue.isPaused())
+    await queue.resume();
+  });
+
+  queue.on("active", async (job) => {
+    console.log(`Job: ${job.id} has started.`);
+    await queue.pause();
+  });
+
+  queue.on("paused", () => console.log(`Whatsapp Queue has paused.`));
+  queue.on("resumed", () => console.log("Whatsapp Queue has resumed."));
+
+  queue.on("error", (err) => {
+    console.log(`Something happened!`)
+  });
+
+  // queue.on("global:resumed", () => console.log("Whatsapp Queue has resumed"));
   queue.process(processor); // link the correspondant processor/worker
 
   logger.info(`Processing ${queue.name}...`);

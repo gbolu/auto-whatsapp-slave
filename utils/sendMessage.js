@@ -6,16 +6,20 @@ const sendMessage = async (message, phone_number) => {
     try {
       const whatsappMsgBotPath =
         "autoWhatsApp.py";
-      const { stdout, stderr } = await exec(
+      
+      //  child process to handle autoWhatsapp execution
+      const execCommand = await exec(
         `sudo python3 "${whatsappMsgBotPath}" ${phone_number} "${message}"`
+        // `dir`
       );
+      
+      const {stdout, stderr} = execCommand;
+      if(stderr)
+      throw stderr;
 
-      if(stdout) console.log(stdout);
-      if (stderr) throw stderr;
-      else resolve(true);
+      return resolve();
     } catch (error) {
-      console.error("stderr:", error);
-      reject(error.message);
+      return reject(error.message);
     }
   });
 };
