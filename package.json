@@ -1,8 +1,8 @@
 {
   "name": "auto_whatsapp_omc_slave",
   "version": "1.0.0",
-  "description": "Programatically queue WhatsApp messages to be sent to clients.",
-  "main": "index.js",
+  "description": "Programatically send messages to Whatsapp numbers.",
+  "main": "server.js",
   "scripts": {
     "start": "node --trace-warnings server.js",
     "dev": "nodemon --trace-warnings server.js"
