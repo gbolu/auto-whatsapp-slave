@@ -38,12 +38,28 @@ activeQueues.forEach((handler) => {
   queue.on("failed", async(job, err) => {
     try {
       logger.error(err);
+
+      job.data.attemptsMade ? job.data.attemptsMade += 1 : job.data.attemptsMade = 1
+
+      if(job.data.attemptsMade === 3){
+        try {
+          logger.info(`Sending failed status message...`)
+          await statusUpdateQueue.add({id: job.data.id, status: "failed"}, {attempts: 3});   
+          await job.discard();
+          if(await queue.isPaused())
+          await queue.resume();
+          return;
+        } catch (error) {
+          throw Error(`An error occurred sending a status message for job with id: ${job.data.id}.`)
+        }
+      } 
+
       await queue.removeJobs(job.id);
       
       if(await queue.isPaused())
-      await queue.resume()
+      await queue.resume();
 
-      await queue.add(job.data, {delay: 20000});
+      await queue.add(job.data, {delay: 3000});
     } catch (error) {
       console.log(error.message)
     }
