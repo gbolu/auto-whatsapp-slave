@@ -1,4 +1,5 @@
 const sendMessage = require("./sendMessage");
+const successQueue = require('./successQueue');
 
 const processor = async job => {
   const { id, message, phone_number } = job.data;
@@ -11,6 +12,7 @@ const processor = async job => {
 
   try {
     await successQueue.add({id}, {attempts: 3});
+    console.log("")
   } catch (error) {
     console.log("Error sending status message.");
   }
