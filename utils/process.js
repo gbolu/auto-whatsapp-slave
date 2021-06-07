@@ -12,7 +12,7 @@ const processor = async job => {
 
   try {
     await successQueue.add({id}, {attempts: 3});
-    console.log("")
+    console.log("Sent success message!")
   } catch (error) {
     console.log("Error sending status message.");
   }
