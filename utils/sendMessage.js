@@ -9,7 +9,7 @@ const sendMessage = async (message, phone_number) => {
       
       //  child process to handle autoWhatsapp execution
       const execCommand = await exec(
-        `sudo python3 "${whatsappMsgBotPath}" ${phone_number} "${message}"`
+        `python3 "${whatsappMsgBotPath}" ${phone_number} "${message}"`
         // `dir`
       );
       
