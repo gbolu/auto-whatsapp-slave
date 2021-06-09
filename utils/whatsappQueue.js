@@ -32,8 +32,8 @@ activeQueues.forEach((handler) => {
   const queue = handler.queue;
   const processor = handler.processor;
 
-  const KeepAliveTimer = new Timer(30, async () => {
-    await queue.add({id: "11111111", message: "Keep alive.", phone_number: "2348100415220", type: "keep_alive"});
+  const KeepAliveTimer = new Timer(60 * 20, async () => {
+    await queue.add({id: "11111111", message: "Keep alive.", phone_number: "2349133797121", type: "keep_alive"});
   });
 
   const emptyHandler = async () => {
