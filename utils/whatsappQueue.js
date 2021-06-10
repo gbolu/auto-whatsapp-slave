@@ -32,16 +32,16 @@ activeQueues.forEach((handler) => {
   const queue = handler.queue;
   const processor = handler.processor;
 
-  const KeepAliveTimer = new Timer(60 * 20, async () => {
-    await queue.add({id: "11111111", message: "Keep alive.", phone_number: "2349133797121", type: "keep_alive"});
-  });
+  // const KeepAliveTimer = new Timer(60 * 20, async () => {
+  //   await queue.add({id: "11111111", message: "Keep alive.", phone_number: "2349133797121", type: "keep_alive"});
+  // });
 
-  const emptyHandler = async () => {
-    const count = await queue.count();
-    if(count <= 1){
-      queue.emit("empty", []);
-    }
-  }
+  // const emptyHandler = async () => {
+  //   const count = await queue.count();
+  //   if(count <= 1){
+  //     queue.emit("empty", []);
+  //   }
+  // }
 
   // const failHandler = handler.failHandler || handleFailure;
   // const completedHandler = handler.completedHandler || handleCompleted;
@@ -90,6 +90,7 @@ activeQueues.forEach((handler) => {
     if(await queue.isPaused())
     await queue.resume();
   });
+
   queue.on("stalled", async(job) => {
     console.log(`Whatsapp Queue is stalled on job: ${job.id}`);
     
@@ -109,22 +110,22 @@ activeQueues.forEach((handler) => {
   queue.on("active", async (job) => {
     console.log(`Job: ${job.id} has started.`);
     await queue.pause();
-    KeepAliveTimer.destroy();
+    // KeepAliveTimer.destroy();
   });
 
   queue.on("cleaned", (jobs, status) => {
-    queue.emit("empty");
+    // queue.emit("empty");
   })
 
   queue.on("empty", async () => {
-    logger.info(`Starting timer to keep WhatsApp alive...`);
-    KeepAliveTimer.start();
+    // logger.info(`Starting timer to keep WhatsApp alive...`);
+    // KeepAliveTimer.start();
   });
 
   queue.on("paused", () => console.log(`Whatsapp Queue has paused.`));
   queue.on("resumed", async () => {
     console.log("Whatsapp Queue has resumed.")
-    await emptyHandler();
+    // await emptyHandler();
   });
 
   queue.on("error", (err) => {

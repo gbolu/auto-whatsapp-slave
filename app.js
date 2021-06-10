@@ -16,7 +16,7 @@ app.post('/addJob', async (req, res) => {
   const {id, message, phone_number} = req.body;
 
   try {
-    await whatsappQueue.add({id, message, phone_number}, {attempts: 3, backoff: 1000});
+    await whatsappQueue.add({id, message, phone_number}, {backoff: 1000});
   } catch (error) {
     // console.log(error);
     return res.status(500).end();
