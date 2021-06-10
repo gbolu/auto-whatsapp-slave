@@ -66,7 +66,7 @@ activeQueues.forEach((handler) => {
           throw Error(`An error occurred sending a status message for job with id: ${job.data.id}.`)
         }
       } else {
-        await queue.removeJobs(job.id);
+        await job.remove();
         if(await queue.isPaused())
         await queue.resume();
 
