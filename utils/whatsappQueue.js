@@ -32,20 +32,6 @@ activeQueues.forEach((handler) => {
   const queue = handler.queue;
   const processor = handler.processor;
 
-  // const KeepAliveTimer = new Timer(60 * 20, async () => {
-  //   await queue.add({id: "11111111", message: "Keep alive.", phone_number: "2349133797121", type: "keep_alive"});
-  // });
-
-  // const emptyHandler = async () => {
-  //   const count = await queue.count();
-  //   if(count <= 1){
-  //     queue.emit("empty", []);
-  //   }
-  // }
-
-  // const failHandler = handler.failHandler || handleFailure;
-  // const completedHandler = handler.completedHandler || handleCompleted;
-
   // here are samples of listener events : "failed","completed","stalled", the other events will be ignored
   queue.on("failed", async(job, err) => {
     try {
@@ -71,14 +57,13 @@ activeQueues.forEach((handler) => {
         await queue.resume();
 
         if(job.data.type !== "keep_alive"){
-          await queue.add(job.data, {delay: 3000});
+          await queue.add(job.data, {delay: 10000});
         }
       }
 
     } catch (error) {
       console.log(error.message)
     }
-    // console.log(err);
   });
 
   queue.on("completed", async (job) => {
