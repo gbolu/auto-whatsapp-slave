@@ -30,7 +30,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     message.replace('\\n', '\n')
 
     messages = message.split('\n')
-    print('Messages')
+    print(messages)
 
     driver.get("https://web.whatsapp.com/send?phone={}".format(phone_number))
     for text in messages:
