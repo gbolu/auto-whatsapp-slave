@@ -47,8 +47,9 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
         driver_action_chains.reset_actions()
         time.sleep(1)
         driver_action_chains.release()
-        driver_action_chains.send_keys(Keys.SHIFT, Keys.ENTER)
-        driver_action_chains.send_keys(Keys.SHIFT, Keys.ENTER)
+        driver_action_chains.key_down(Keys.SHIFT)
+        driver_action_chains.send_keys(Keys.ENTER)
+        driver_action_chains.release()
         driver_action_chains.perform()
         driver_action_chains.reset_actions()
 
