@@ -14,6 +14,9 @@ const sendMessage = async (message, phone_number) => {
       );
       
       const {stdout, stderr} = execCommand;
+      if(stdout)
+      console.log(stdout)
+      
       if(stderr)
       throw stderr;
 
