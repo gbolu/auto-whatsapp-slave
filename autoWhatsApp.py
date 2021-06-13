@@ -3,7 +3,7 @@ import selenium.webdriver as webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.action_chains import ActionChains, ActionBuilder
 import selenium.webdriver.support.expected_conditions as EC
 from closeCrmInstance import findProcessPid, closeProcess
 import sys,time
@@ -45,6 +45,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
         driver_action_chains.release()
         driver_action_chains.send_keys(Keys.SHIFT, Keys.ENTER)
         driver_action_chains.send_keys(Keys.SHIFT, Keys.ENTER)
+        driver_action_chains.perform()
 
     WebDriverWait(driver, 60, 0.5).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[3]/button'))).click()
     # close any lingering processes 
