@@ -2,6 +2,8 @@ from deleteProfileDirs import deleteDir
 import selenium.webdriver as webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 import selenium.webdriver.support.expected_conditions as EC
 from closeCrmInstance import findProcessPid, closeProcess
 import sys
@@ -27,9 +29,16 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
 
     message.replace('\\n', '\n')
 
-    driver.get("https://web.whatsapp.com/send?phone={}".format(phone_number))
+    messages = message.split('\n')
 
-    WebDriverWait(driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]'))).send_keys(message)
+    driver.get("https://web.whatsapp.com/send?phone={}".format(phone_number))
+    for text in messages:
+        textElement = WebDriverWait(driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]')))
+        ActionChains(driver).click(textElement)
+        textElement.send_keys(text)
+        ActionChains(driver).send_keys(Keys.SHIFT, Keys.ENTER)
+        ActionChains(driver).send_keys(Keys.SHIFT, Keys.ENTER)
+
     WebDriverWait(driver, 60, 0.5).until(EC.element_to_be_clickable((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[3]/button'))).click()
     # close any lingering processes 
     if message not in driver.page_source:
