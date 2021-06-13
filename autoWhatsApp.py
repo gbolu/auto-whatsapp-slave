@@ -27,9 +27,9 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     driver = webdriver.Chrome(
     executable_path=executable_path, options=options)
 
-    message.replace('\\n', '\n')
+    message.replace('\\\n', '\\n')
 
-    messages = message.split('\n')
+    messages = message.split('\\n')
     print(messages)
 
     driver.get("https://web.whatsapp.com/send?phone={}".format(phone_number))
