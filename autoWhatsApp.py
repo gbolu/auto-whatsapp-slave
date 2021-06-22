@@ -33,7 +33,6 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     driver.get("https://web.whatsapp.com/send?phone={}".format(phone_number))
     textElement = WebDriverWait(driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]')))
     # driver_action_chains = ActionChains(driver)
-    clickButtonElement = WebDriverWait(driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[3]/button')))
     for text in messages:
         # click on text field
         # driver_action_chains.click(textElement)
@@ -44,6 +43,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
         textElement.send_keys(text)
 
         # click send button
+        clickButtonElement = WebDriverWait(driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[3]/button')))
         clickButtonElement.click()
         # # go to new line
         # driver_action_chains.key_down(Keys.SHIFT)
