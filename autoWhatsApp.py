@@ -64,6 +64,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
         print('Message to {} has been sent!'.format(phone_number))
         pass
 if __name__ == '__main__':
+    closeProcess(findProcessPid("chrome"))
     deleteDir('./user-data/"Local State"')
     deleteDir('./user-data/Default/Preferences')
     autoWhatsApp("--user-data-dir=/home/gboluwagaadeyemi/code_files/auto_whatsapp_slave/user-data", 
