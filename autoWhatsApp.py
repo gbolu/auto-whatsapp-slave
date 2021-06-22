@@ -53,7 +53,7 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
         # driver_action_chains.reset_actions()
 
     # close any lingering processes 
-    messages = messages.replace("\n", "")
+    messages = message.replace("\n", "")
     print(messages)
     source = driver.page_source
     for text in messages:
