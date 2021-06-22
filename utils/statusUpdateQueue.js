@@ -9,11 +9,12 @@ const statusUpdateQueue = new Queue("whatsapp", {
 
 statusUpdateQueue.process((job) => new Promise(async(resolve, reject) => {
     const {id, status} = job.data;
+    console.log(job.data);
 
     let query = `${process.env.SUCCESS_URL}?id=${id}&status=${status}`;
 
     try {
-        console.log(`ID: ${id}, Status: ${status}`);
+        // console.log(`ID: ${id}, Status: ${status}`);
         await axios.get(query);
     } catch (error) {
         reject(error);
