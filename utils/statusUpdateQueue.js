@@ -13,6 +13,7 @@ statusUpdateQueue.process((job) => new Promise(async(resolve, reject) => {
     let query = `${process.env.SUCCESS_URL}?id=${id}&status=${status}`;
 
     try {
+        console.log(`ID: ${id}, Status: ${status}`);
         await axios.get(query);
     } catch (error) {
         reject(error);
