@@ -10,3 +10,4 @@ debug.log
 images/
 .env
 user-data/
+temp_env/

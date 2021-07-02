@@ -5,17 +5,17 @@ class Timer{
         this.timer = null;
     }
 
-    destroy(){
+    destroy(message){
         clearTimeout(this.timer);
-        console.log(`Destroyed Keep Alive Timer!`);
+        console.log(`${message}`);
     }
 
     start(){
         if(this.timer instanceof setTimeout(function(){}, 0, []).constructor){
-            this.destroy();
-            console.log(`Destroyed old timer! Starting new timer!`);
+            this.destroy(`Destroyed old timer!`);
         }
 
+        console.log(`Starting new Timer: ${this.seconds}s`)
         this.timer = setTimeout(async () => {
             await this.fn();
         }, this.seconds * 1000, [])

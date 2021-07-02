@@ -98,10 +98,6 @@ activeQueues.forEach((handler) => {
     // KeepAliveTimer.destroy();
   });
 
-  queue.on("cleaned", (jobs, status) => {
-    // queue.emit("empty");
-  })
-
   queue.on("empty", async () => {
     // logger.info(`Starting timer to keep WhatsApp alive...`);
     // KeepAliveTimer.start();
@@ -117,7 +113,6 @@ activeQueues.forEach((handler) => {
     console.log(`Something happened!`)
   });
 
-  // queue.on("global:resumed", () => console.log("Whatsapp Queue has resumed"));
   queue.process(processor); // link the correspondant processor/worker
 
   logger.info(`Processing ${queue.name}...`);
