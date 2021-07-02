@@ -2,13 +2,12 @@ from deleteProfileDirs import deleteDir
 import selenium.webdriver as webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains, ActionBuilder
 import selenium.webdriver.support.expected_conditions as EC
 from closeCrmInstance import findProcessPid, closeProcess
-import sys,time
+import sys
 
 def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', executable_path="/home/gboluwagaadeyemi/code_files/auto_whatsapp/chromedriver"):
+    #   prep webdriver 
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.binary_location = "/usr/bin/google-chrome-stable"
@@ -24,38 +23,32 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     options.add_argument('user-agent=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36')
     options.add_argument('--allow-running-insecure-content')
     options.add_argument('--ignore-certificate-errors')
+
+    # instantiate chrome webdriver
     driver = webdriver.Chrome(
     executable_path=executable_path, options=options)
 
+    # split message by new line character (/n)  
     messages = [text for text in message.split('\n') if text != '']
-    print(messages)
 
+    # open new whatsapp web window
     driver.get("https://web.whatsapp.com/send?phone={}".format(phone_number))
+    
+    # select text field used to input messages
     textElement = WebDriverWait(driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]')))
-    # driver_action_chains = ActionChains(driver)
-    for text in messages:
-        # click on text field
-        # driver_action_chains.click(textElement)
-        # driver_action_chains.perform()
-        # driver_action_chains.reset_actions()
 
+    for text in messages:
         # # add text to text field
         textElement.send_keys(text)
 
         # click send button
         clickButtonElement = WebDriverWait(driver, 60, 0.5).until(EC.presence_of_element_located((By.XPATH, '/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[3]/button')))
         clickButtonElement.click()
-        # # go to new line
-        # driver_action_chains.key_down(Keys.SHIFT)
-        # driver_action_chains.send_keys(Keys.ENTER)
-        # driver_action_chains.release()
-        # driver_action_chains.perform()
-        # driver_action_chains.reset_actions()
 
-    # close any lingering processes 
     messages = message.replace("\n", "")
-    print(messages)
     source = driver.page_source
+
+    # check if text is within body of webpage
     for text in messages:
         if text in source:
             break
@@ -67,6 +60,8 @@ def autoWhatsApp(user_profile_path, phone_number='2348100415220', message='', ex
     finally:
         print('Message to {} has been sent!'.format(phone_number))
         pass
+
+
 if __name__ == '__main__':
     closeProcess(findProcessPid("chrome"))
     deleteDir('./user-data/"Local State"')
