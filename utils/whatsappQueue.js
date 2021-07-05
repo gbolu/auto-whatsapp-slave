@@ -1,6 +1,26 @@
-const Queue = require('bull');
 require('dotenv').config();
-const processor = require('./process');
+
+const Queue = require('bull');
+const EventEmitter = require("events");
+const logger = require("./logger");
+
+const AutoWhatsApp = require("./autoWhatsApp");
+const statusUpdateQueue = require('./statusUpdateQueue');
+const args = [
+    '--headless',
+    'disable-extensions', 'no-sandbox',
+    "proxy-server='direct://'", 'proxy-bypass-list=*',
+    'start-maximized', 'disable-gpu',
+    "window-size=1920,1080",
+    'user-agent=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
+    'allow-running-insecure-content', 'ignore-certificate-errors', 
+    `user-data-dir=${process.env.USER_DATA_DIR}`
+]
+
+const auto = new AutoWhatsApp(args);
+(async () => {
+  await auto.driver.get("https://www.google.com")
+})();
 
 const whatsappQueue = new Queue("whatsapp", {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
@@ -15,22 +35,16 @@ const whatsappQueue = new Queue("whatsapp", {
 // ncrease the max listeners to get rid of the warning below
 // MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 
 // 11 global:completed listeners added. Use emitter.setMaxListeners() to increase limit
-const EventEmitter = require("events");
 EventEmitter.defaultMaxListeners = 50;
-
-const logger = require("./logger");
-const Timer = require('./timer');
 
 const activeQueues = [
   {
     queue: whatsappQueue,
-    processor: processor
   }
 ];
 
 activeQueues.forEach((handler) => {
   const queue = handler.queue;
-  const processor = handler.processor;
 
   // here are samples of listener events : "failed","completed","stalled", the other events will be ignored
   queue.on("failed", async(job, err) => {
@@ -113,7 +127,25 @@ activeQueues.forEach((handler) => {
     console.log(`Something happened!`)
   });
 
-  queue.process(processor); // link the correspondant processor/worker
+  // link the correspondant processor/worker
+  queue.process(async job => {
+    const { id, message, phone_number } = job.data;
+
+    try {
+      await auto.sendMessage(phone_number, message);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+
+    try {
+      await statusUpdateQueue.add({id, status: "successful"}, {attempts: 3});
+      console.log("Sent success message!")
+    } catch (error) {
+      console.log("Error sending status message.");
+    }
+
+    return Promise.resolve();
+}); 
 
   logger.info(`Processing ${queue.name}...`);
 });
