@@ -7,7 +7,7 @@ const logger = require("./logger");
 const AutoWhatsApp = require("./autoWhatsApp");
 const statusUpdateQueue = require('./statusUpdateQueue');
 const args = [
-    '--headless',
+    // '--headless',
     'disable-extensions', 'no-sandbox',
     "proxy-server='direct://'", 'proxy-bypass-list=*',
     'start-maximized', 'disable-gpu',
@@ -25,10 +25,8 @@ const auto = new AutoWhatsApp(args);
 const whatsappQueue = new Queue("whatsapp", {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
   settings: {
-    drainDelay: 10,
-    guardInterval: 100,
-    stalledInterval: 100,
-    maxStalledCount: 0
+    maxStalledCount: 0,
+    stalledInterval: 0,
   }
 });
 
@@ -81,13 +79,18 @@ activeQueues.forEach((handler) => {
   });
 
   queue.on("completed", async (job) => {
-    logger.info(
-      `Job: ${job.id} completed.`
-    );
-    await job.remove();
-
-    if(await queue.isPaused())
-    await queue.resume();
+    try {
+      logger.info(
+        `Job: ${job.id} completed.`
+      );
+      await job.remove();
+      await queue.removeJobs(job.id)
+  
+      if(await queue.isPaused())
+      await queue.resume();  
+    } catch (error) {
+      console.error(error)
+    }
   });
 
   queue.on("stalled", async(job) => {
@@ -109,7 +112,6 @@ activeQueues.forEach((handler) => {
   queue.on("active", async (job) => {
     console.log(`Job: ${job.id} has started.`);
     await queue.pause();
-    // KeepAliveTimer.destroy();
   });
 
   queue.on("empty", async () => {
@@ -124,27 +126,24 @@ activeQueues.forEach((handler) => {
   });
 
   queue.on("error", (err) => {
-    console.log(`Something happened!`)
+    console.log(err)
   });
 
   // link the correspondant processor/worker
-  queue.process(async job => {
+  queue.process(function(job) {
     const { id, message, phone_number } = job.data;
 
-    try {
-      await auto.sendMessage(phone_number, message);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-
-    try {
-      await statusUpdateQueue.add({id, status: "successful"}, {attempts: 3});
-      console.log("Sent success message!")
-    } catch (error) {
-      console.log("Error sending status message.");
-    }
-
-    return Promise.resolve();
+    return auto.sendMessage(phone_number, message)
+      .then(() => {
+        console.log('Job done!');
+        return statusUpdateQueue.add(job.data, {attempts: 3})
+        .then(() => {
+          console.log('Status updated!');
+          return;
+        })
+        .catch(err => {throw err;})
+      })
+      .catch(err => console.log(err));
 }); 
 
   logger.info(`Processing ${queue.name}...`);
