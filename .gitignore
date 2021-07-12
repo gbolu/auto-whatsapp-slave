@@ -3,7 +3,7 @@ __pycache__/
 node_modules/
 chrome-data/
 chrome-user-data/
-chromedriver
+*chromedriver.*
 yarn.lock
 npm-debug.log
 debug.log

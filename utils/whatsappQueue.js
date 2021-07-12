@@ -1,36 +1,48 @@
-const Queue = require('bull');
 require('dotenv').config();
-const processor = require('./process');
+
+const Queue = require('bull');
+const EventEmitter = require("events");
+const logger = require("./logger");
+
+const AutoWhatsApp = require("./autoWhatsApp");
+const statusUpdateQueue = require('./statusUpdateQueue');
+const args = [
+    // '--headless',
+    'disable-extensions', 'no-sandbox',
+    "proxy-server='direct://'", 'proxy-bypass-list=*',
+    'start-maximized', 'disable-gpu',
+    "window-size=1920,1080",
+    'user-agent=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
+    'allow-running-insecure-content', 'ignore-certificate-errors', 
+    `user-data-dir=${process.env.USER_DATA_DIR}`
+]
+
+const auto = new AutoWhatsApp(args);
+(async () => {
+  await auto.driver.get("https://www.google.com")
+})();
 
 const whatsappQueue = new Queue("whatsapp", {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
   settings: {
-    drainDelay: 10,
-    guardInterval: 100,
-    stalledInterval: 100,
-    maxStalledCount: 0
+    maxStalledCount: 0,
+    stalledInterval: 0,
   }
 });
 
 // ncrease the max listeners to get rid of the warning below
 // MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 
 // 11 global:completed listeners added. Use emitter.setMaxListeners() to increase limit
-const EventEmitter = require("events");
 EventEmitter.defaultMaxListeners = 50;
-
-const logger = require("./logger");
-const Timer = require('./timer');
 
 const activeQueues = [
   {
     queue: whatsappQueue,
-    processor: processor
   }
 ];
 
 activeQueues.forEach((handler) => {
   const queue = handler.queue;
-  const processor = handler.processor;
 
   // here are samples of listener events : "failed","completed","stalled", the other events will be ignored
   queue.on("failed", async(job, err) => {
@@ -67,13 +79,18 @@ activeQueues.forEach((handler) => {
   });
 
   queue.on("completed", async (job) => {
-    logger.info(
-      `Job: ${job.id} completed.`
-    );
-    await job.remove();
-
-    if(await queue.isPaused())
-    await queue.resume();
+    try {
+      logger.info(
+        `Job: ${job.id} completed.`
+      );
+      await job.remove();
+      await queue.removeJobs(job.id)
+  
+      if(await queue.isPaused())
+      await queue.resume();  
+    } catch (error) {
+      console.error(error)
+    }
   });
 
   queue.on("stalled", async(job) => {
@@ -95,7 +112,6 @@ activeQueues.forEach((handler) => {
   queue.on("active", async (job) => {
     console.log(`Job: ${job.id} has started.`);
     await queue.pause();
-    // KeepAliveTimer.destroy();
   });
 
   queue.on("empty", async () => {
@@ -110,10 +126,25 @@ activeQueues.forEach((handler) => {
   });
 
   queue.on("error", (err) => {
-    console.log(`Something happened!`)
+    console.log(err)
   });
 
-  queue.process(processor); // link the correspondant processor/worker
+  // link the correspondant processor/worker
+  queue.process(function(job) {
+    const { id, message, phone_number } = job.data;
+
+    return auto.sendMessage(phone_number, message)
+      .then(() => {
+        console.log('Job done!');
+        return statusUpdateQueue.add(job.data, {attempts: 3})
+        .then(() => {
+          console.log('Status updated!');
+          return;
+        })
+        .catch(err => {throw err;})
+      })
+      .catch(err => console.log(err));
+}); 
 
   logger.info(`Processing ${queue.name}...`);
 });
