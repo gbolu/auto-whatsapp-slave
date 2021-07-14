@@ -4,7 +4,7 @@
   "description": "Programatically send messages to Whatsapp numbers.",
   "main": "server.js",
   "scripts": {
-    "start": "pm2 start server.js --name anon-messenger-slave",
+    "start": "node --trace-warnings server.js",
     "dev": "nodemon --trace-warnings server.js"
   },
   "keywords": [
