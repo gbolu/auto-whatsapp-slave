@@ -70,6 +70,7 @@ class AutoWhatsapp {
                 await this.driver.switchTo().window(baseWindowHandle);
             } catch (error) {
                 console.log(error);
+                console.log((await this.driver.getPageSource()))
             }
         } catch (error) {
             console.log(error);
