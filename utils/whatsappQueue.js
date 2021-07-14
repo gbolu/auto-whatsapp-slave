@@ -140,7 +140,7 @@ activeQueues.forEach((handler) => {
     return auto.sendMessage(phone_number, message)
       .then(() => {
         console.log('Job done!');
-        return statusUpdateQueue.add(job.data, {attempts: 3})
+        return statusUpdateQueue.add({...job.data, status: "success"}, {attempts: 3})
         .then(() => {
           console.log('Status updated!');
           return Promise.resolve();
