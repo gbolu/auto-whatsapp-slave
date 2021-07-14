@@ -142,18 +142,17 @@ activeQueues.forEach((handler) => {
   queue.process(function(job) {
     const { id, message, phone_number } = job.data;
 
-    // return auto.sendMessage(phone_number, message)
-    //   .then(() => {
-    //     console.log('Job done!');
-    //     return statusUpdateQueue.add(job.data, {attempts: 3})
-    //     .then(() => {
-    //       console.log('Status updated!');
-    //       return;
-    //     })
-    //     .catch(err => {console.log(err)})
-    //   })
-    //   .catch(err => console.log(err));
-    console.log("DOne");
+    auto.sendMessage(phone_number, message)
+      .then(() => {
+        console.log('Job done!');
+        return statusUpdateQueue.add(job.data, {attempts: 3})
+        .then(() => {
+          console.log('Status updated!');
+          return;
+        })
+        .catch(err => {console.log(err)})
+      })
+      .catch(err => console.log(err));
     return Promise.resolve();
 }); 
 
