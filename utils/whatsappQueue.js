@@ -137,18 +137,17 @@ activeQueues.forEach((handler) => {
   queue.process(1, function(job) {
     const { id, message, phone_number } = job.data;
 
-    auto.sendMessage(phone_number, message)
+    return auto.sendMessage(phone_number, message)
       .then(() => {
         console.log('Job done!');
         return statusUpdateQueue.add(job.data, {attempts: 3})
         .then(() => {
           console.log('Status updated!');
-          return;
+          return Promise.resolve();
         })
         .catch(err => {console.log(err)})
       })
       .catch(err => console.log(err));
-    return Promise.resolve();
 }); 
 
   logger.info(`Processing ${queue.name}...`);
