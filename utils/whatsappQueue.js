@@ -20,7 +20,7 @@ const args = [
 const auto = new AutoWhatsApp(args);
 (async () => {
   try {
-    await auto.driver.get("https://www.google.com")
+    auto.driver.get("https://www.google.com").then(() => console.log("Opened Google")).catch(err => console.log(err))
   } catch (error) {
     console.log(error);
   }
