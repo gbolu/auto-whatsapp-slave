@@ -27,12 +27,18 @@ class AutoWhatsapp {
     async sendMessage(phone_number='2348186511634', message='') {
         //  split message by new line character
         let messages = message.split('\n');
+        console.log("Reached!")
 
         //  remove empty characters from message
         messages = messages.filter(message => message !== '');
 
         //  navigate to the whatsapp web webpage in a new tab
-        await this.driver.executeScript(`window.open('https://web.whatsapp.com/send?phone=${phone_number}')`);
+        try {
+            await this.driver.executeScript(`window.open('https://web.whatsapp.com/send?phone=${phone_number}')`);
+            
+        } catch (error) {
+            
+        }
         let windowHandles = await this.driver.getAllWindowHandles();
         let baseWindowHandle = await this.driver.getWindowHandle();
         let targetWindowHandle = windowHandles.filter(windowHandle => windowHandle != baseWindowHandle)[0];
