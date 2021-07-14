@@ -134,7 +134,7 @@ activeQueues.forEach((handler) => {
   });
 
   // link the correspondant processor/worker
-  queue.process(function(job) {
+  queue.process(1, function(job) {
     const { id, message, phone_number } = job.data;
 
     auto.sendMessage(phone_number, message)
