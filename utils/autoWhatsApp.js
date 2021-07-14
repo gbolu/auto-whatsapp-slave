@@ -10,7 +10,7 @@ class AutoWhatsapp {
     }
 
     init(args){
-        let newChromeOptions = new chrome.Options();
+        let newChromeOptions = new chrome.Options().setChromeBinaryPath(process.env.CHROME_BINARY);
         
         for (let arg of args)
         {
