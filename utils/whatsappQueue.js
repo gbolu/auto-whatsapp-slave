@@ -29,6 +29,8 @@ const auto = new AutoWhatsApp(args);
 const whatsappQueue = new Queue("whatsapp", {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
   settings: {
+    drainDelay: 500,
+    guardInterval: 500,
     maxStalledCount: 0,
     stalledInterval: 0,
   },
