@@ -41,7 +41,7 @@ class AutoWhatsapp {
             await this.driver.switchTo().window(targetWindowHandle);
 
             //  select text field used to input messages
-            let textElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[1]/div/div[2]')))  
+            let textElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[1]/div/div[2]')), 20000)  
 
             for(let text of messages)
             {
@@ -49,7 +49,7 @@ class AutoWhatsapp {
                 await textElement.sendKeys(text);
 
                 //  click send button
-                let clickButtonElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]/button')));
+                let clickButtonElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]/button')), 20000);
                 await clickButtonElement.click();
             }
 
@@ -72,7 +72,7 @@ class AutoWhatsapp {
                 console.log(error);
             }
         } catch (error) {
-            console.log(err);
+            console.log(error);
             await Promise.reject(error);
         }
         
