@@ -75,7 +75,7 @@ class AutoWhatsapp {
             console.log(error);
             let page_source = await this.driver.getPageSource();
             console.log(page_source);
-            await Promise.reject(error);
+            throw error;
         }
         
         await Promise.resolve();
