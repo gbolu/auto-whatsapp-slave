@@ -9,7 +9,6 @@ const statusUpdateQueue = new Queue("whatsapp", {
 
 statusUpdateQueue.process((job) => new Promise(async(resolve, reject) => {
     const {id, status} = job.data;
-    console.log(status);
 
     let query = `${process.env.SUCCESS_URL}?id=${id}&status=${status}`;
 

@@ -27,7 +27,6 @@ class AutoWhatsapp {
     async sendMessage(phone_number='2348186511634', message='') {
         //  split message by new line character
         let messages = message.split('\n');
-        console.log("Reached!")
 
         //  remove empty characters from message
         messages = messages.filter(message => message !== '');

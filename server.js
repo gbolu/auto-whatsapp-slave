@@ -14,9 +14,17 @@ const port = process.env.PORT || 4000;
 
 const server = createServer(app);
 
+(async () => {
+  try {
+    await cleanWhatsappQueue();
+    console.log("Cleaned");
+  } catch (error) {
+    console.log(error);
+  }
+})()
+
 server.listen(port, () => {
   console.log(`Slave Server is listening on port:${port}`);
-  cleanWhatsappQueue().then(() => console.log("Cleaned!"));
 })
 
 process.on('unhandledRejection', (err) => {
