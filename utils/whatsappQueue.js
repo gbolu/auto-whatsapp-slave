@@ -150,7 +150,7 @@ activeQueues.forEach((handler) => {
           console.log('Status updated!');
           return;
         })
-        .catch(err => {throw err;})
+        .catch(err => {console.log(err)})
       })
       .catch(err => console.log(err));
 }); 
