@@ -19,7 +19,11 @@ const args = [
 
 const auto = new AutoWhatsApp(args);
 (async () => {
-  await auto.driver.get("https://www.google.com")
+  try {
+    await auto.driver.get("https://www.google.com")
+  } catch (error) {
+    console.log(error);
+  }
 })();
 
 const whatsappQueue = new Queue("whatsapp", {
