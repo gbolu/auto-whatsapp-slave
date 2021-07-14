@@ -7,7 +7,7 @@ const logger = require("./logger");
 const AutoWhatsApp = require("./autoWhatsApp");
 const statusUpdateQueue = require('./statusUpdateQueue');
 const args = [
-    '--headless',
+    '--headless',  
     'disable-extensions', 'no-sandbox',
     "proxy-server='direct://'", 'proxy-bypass-list=*',
     'start-maximized', 'disable-gpu',
@@ -27,6 +27,11 @@ const whatsappQueue = new Queue("whatsapp", {
   settings: {
     maxStalledCount: 0,
     stalledInterval: 0,
+  },
+  limiter: {
+    max: 1,
+    bounceBack: true,
+    duration: 30000
   }
 });
 
