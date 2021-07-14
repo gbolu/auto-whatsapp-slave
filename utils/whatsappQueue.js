@@ -32,11 +32,6 @@ const whatsappQueue = new Queue("whatsapp", {
     maxStalledCount: 0,
     stalledInterval: 0,
   },
-  limiter: {
-    max: 1,
-    bounceBack: true,
-    duration: 30000
-  }
 });
 
 // ncrease the max listeners to get rid of the warning below
