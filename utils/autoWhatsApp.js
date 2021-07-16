@@ -40,7 +40,7 @@ class AutoWhatsapp {
             await this.driver.switchTo().window(targetWindowHandle);
 
             //  select text field used to input messages
-            let textElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[1]/div/div[2]')), 20000)  
+            let textElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[1]/div/div[2]')), 30000)  
 
             for(let text of messages)
             {
@@ -48,7 +48,7 @@ class AutoWhatsapp {
                 await textElement.sendKeys(text);
 
                 //  click send button
-                let clickButtonElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]/button')), 20000);
+                let clickButtonElement = await this.driver.wait(until.elementLocated(By.xpath('/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]/button')), 30000);
                 await clickButtonElement.click();
             }
 
@@ -64,17 +64,10 @@ class AutoWhatsapp {
                 throw Error("Failed to send message!");
             }
 
-            try {
-                await this.driver.close();
-                await this.driver.switchTo().window(baseWindowHandle);
-            } catch (error) {
-                console.log(error);
-            }
+            await this.driver.close();
+            await this.driver.switchTo().window(baseWindowHandle);
         } catch (error) {
-            console.log(error);
-            let page_source = await this.driver.getPageSource();
-            console.log(page_source);
-            throw error;
+            await Promise.reject(error)
         }
         
         await Promise.resolve();

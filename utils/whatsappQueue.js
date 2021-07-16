@@ -73,10 +73,7 @@ activeQueues.forEach((handler) => {
         await job.remove();
         if(await queue.isPaused())
         await queue.resume();
-
-        if(job.data.type !== "keep_alive"){
-          await queue.add(job.data, {delay: 10000});
-        }
+        await queue.add(job.data, {delay: 10000});
       }
 
     } catch (error) {
@@ -142,14 +139,17 @@ activeQueues.forEach((handler) => {
     return auto.sendMessage(phone_number, message)
       .then(() => {
         console.log('Job done!');
-        return statusUpdateQueue.add({id, status: "successful"})
+        return statusUpdateQueue.add({id, status: "successful"}, {attempts: 3, removeOnComplete: true})
         .then(() => {
-          console.log('Status updated!');
           return Promise.resolve();
         })
-        .catch(err => {console.log(err)})
+        .catch(err => {
+          throw new Error(err);
+        })
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        throw new Error(err);
+      });
 }); 
 
   logger.info(`Processing ${queue.name}...`);
