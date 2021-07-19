@@ -56,7 +56,7 @@ class AutoWhatsapp {
     async firefoxInit () {
         let firefoxOptions = new firefox.Options();
         firefoxOptions.setProfile(this.user_data_dir);
-        // firefoxOptions.headless();
+        firefoxOptions.headless();
         firefoxOptions.windowSize({width: 1280, height: 720});
 
         try {
