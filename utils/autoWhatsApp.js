@@ -1,27 +1,74 @@
 const { Builder, Capabilities, until, By } = require("selenium-webdriver");
 const chrome = require('selenium-webdriver/chrome');
-
+const firefox = require('selenium-webdriver/firefox');
+const path = require('path');
+const rimraf = require('rimraf');
 class AutoWhatsapp {
     /**
-     * @param {Array<String>} chrome_options_args
+     * @param {Array<String>} browser_options_args
      */
-    constructor(chrome_options_args){
-        this.init(chrome_options_args);
+    constructor (browser_options_args=[], browser_type, user_data_dir = null) {
+        this.browser_options_args = browser_options_args;
+        this.browser_type = browser_type;
+        this.user_data_dir = user_data_dir;
     }
 
-    init(args){
-        let newChromeOptions = new chrome.Options().setChromeBinaryPath(process.env.CHROME_BINARY);
+    async chromeInit () {
+        let chromeOptions = new chrome.Options()
+
+        rimraf(path.resolve(this.user_data_dir, 'Local State'), (err) => {
+            if(err){
+                console.log(err);
+                return;
+            }
+
+            console.log(`Removed Local State folder.`);
+        });
+
+        rimraf(path.resolve(this.user_data_dir, 'Default', 'Preferences'), (err) => {
+            if(err){
+                console.log(err);
+                return;
+            }
+
+            console.log(`Removed Default Preferences folder..`);
+        });
         
-        for (let arg of args)
+        for (let arg of this.browser_options_args)
         {
-            newChromeOptions.addArguments(arg);
+            chromeOptions.addArguments(arg);
         }
 
-        this.driver = new Builder()
+        try {
+            let driver = await new Builder()
             .forBrowser('chrome')
             .withCapabilities(Capabilities.chrome())
-            .setChromeOptions(newChromeOptions)
-            .build()
+            .setChromeOptions(chromeOptions)
+            .build();
+
+            this.driver = driver;
+            console.log(`Created Selenium driver for chrome...`);
+        } catch (error) {
+            throw new Error(err);
+        }
+    }
+
+    async firefoxInit () {
+        let firefoxOptions = new firefox.Options();
+        firefoxOptions.setProfile(this.user_data_dir);
+        // firefoxOptions.headless();
+        firefoxOptions.windowSize({width: 1280, height: 720});
+
+        try {
+            let driver = await new Builder()
+            .forBrowser('firefox')
+            .setFirefoxOptions(firefoxOptions)
+            .build();
+            this.driver = driver; 
+            console.log(`Created Selenium driver for firefox...`)
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 
     async sendMessage(phone_number='2348186511634', message='') {
@@ -31,12 +78,16 @@ class AutoWhatsapp {
         //  remove empty characters from message
         messages = messages.filter(message => message !== '');
 
+        let windowHandles;
+        let baseWindowHandle;
+        let targetWindowHandle;
+
         //  navigate to the whatsapp web webpage in a new tab
         try {
             await this.driver.executeScript(`window.open('https://web.whatsapp.com/send?phone=${phone_number}')`);
-            let windowHandles = await this.driver.getAllWindowHandles();
-            let baseWindowHandle = await this.driver.getWindowHandle();
-            let targetWindowHandle = windowHandles.filter(windowHandle => windowHandle != baseWindowHandle)[0];
+            windowHandles = await this.driver.getAllWindowHandles();
+            baseWindowHandle = await this.driver.getWindowHandle();
+            targetWindowHandle = windowHandles.filter(windowHandle => windowHandle != baseWindowHandle)[0];
             await this.driver.switchTo().window(targetWindowHandle);
 
             //  select text field used to input messages
@@ -63,11 +114,11 @@ class AutoWhatsapp {
                 else
                 throw Error("Failed to send message!");
             }
-
-            await this.driver.close();
-            await this.driver.switchTo().window(baseWindowHandle);
         } catch (error) {
             await Promise.reject(error)
+        } finally {
+            await this.driver.close();
+            await this.driver.switchTo().window(baseWindowHandle);
         }
         
         await Promise.resolve();

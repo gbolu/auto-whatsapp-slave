@@ -34,7 +34,7 @@ statusUpdateQueue.on("failed", async(job, err) => {
 statusUpdateQueue.on("completed", async (job) => {
   try {
     logger.info(
-      `Job with messageID: ${job.data.id} completed.`
+      `Job with messageID: ${job.data.id} and status: ${job.data.status} completed.`
     ); 
   } catch (error) {
     console.error(error)

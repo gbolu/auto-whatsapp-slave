@@ -17,10 +17,15 @@ const args = [
     `user-data-dir=${process.env.USER_DATA_DIR}`
 ]
 
-const auto = new AutoWhatsApp(args);
+let auto;
+auto = process.env.BROWSER_TYPE === 'chrome' ? new AutoWhatsApp(args, 'chrome', process.env.USER_DATA_DIR) 
+  : new AutoWhatsApp([], 'firefox', process.env.USER_DATA_DIR);
 (async () => {
   try {
-    auto.driver.get("https://www.google.com").then(() => console.log("Opened Google")).catch(err => console.log(err))
+    process.env.BROWSER_TYPE === 'chrome' ? await auto.chromeInit() : await auto.firefoxInit();
+    await auto.driver.get("https://www.google.com")
+    .then(() => console.log("Opened Google"))
+    .catch(err => console.log(err))
   } catch (error) {
     console.log(error);
   }
