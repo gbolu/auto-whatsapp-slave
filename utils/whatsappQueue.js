@@ -175,7 +175,7 @@ activeQueues.forEach((handler) => {
       });
 }); 
 
-  logger.info(`Processing ${queue.name}...`);
+  logger.info(`Processing ${queue.name}-${process.env.BROWSER_TYPE}...`);
 });
 
 module.exports = whatsappQueue;
