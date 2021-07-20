@@ -1,6 +1,7 @@
 const { Builder, Capabilities, until, By } = require("selenium-webdriver");
 const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
+const edge = require('selenium-webdriver/edge');
 const path = require('path');
 const rimraf = require('rimraf');
 class AutoWhatsapp {
@@ -14,7 +15,8 @@ class AutoWhatsapp {
     }
 
     async chromeInit () {
-        let chromeOptions = new chrome.Options()
+        this.browser_options_args.push(`user-data-dir=${this.user_data_dir}`)
+        let chromeOptions = new chrome.Options();
 
         rimraf(path.resolve(this.user_data_dir, 'Local State'), (err) => {
             if(err){
@@ -57,7 +59,7 @@ class AutoWhatsapp {
         let firefoxOptions = new firefox.Options();
         firefoxOptions.setProfile(this.user_data_dir);
         firefoxOptions.headless();
-        firefoxOptions.windowSize({width: 1280, height: 720});
+        firefoxOptions.windowSize({width: 1920, height: 1080});
 
         try {
             let driver = await new Builder()
@@ -68,6 +70,28 @@ class AutoWhatsapp {
             console.log(`Created Selenium driver for firefox...`)
         } catch (error) {
             throw new Error(error);
+        }
+    }
+
+    async edgeInit () {
+        this.browser_options_args.push(`user-data-dir=${this.user_data_dir}`)
+
+        let edgeOptions = new edge.Options();
+        // edgeOptions.set('useChromium', true);
+        edgeOptions.addArguments(this.browser_options_args);
+        edgeOptions.setBinaryPath(process.env.EDGE_BINARY);
+        // edgeOptions.headless();
+        let driver;
+
+        try {
+            driver = await new Builder()
+            .forBrowser('MicrosoftEdge')
+            .setEdgeOptions(edgeOptions)
+            .build();
+            this.driver = driver;    
+            console.log(`Created Selenium driver for Edge...`)
+        } catch (error) {
+            console.log(error);
         }
     }
 

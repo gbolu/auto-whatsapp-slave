@@ -5,6 +5,7 @@ chrome-data/
 chrome-user-data/
 *chromedriver.*
 *geckodriver.*
+*msedgedriver.*
 yarn.lock
 npm-debug.log
 debug.log

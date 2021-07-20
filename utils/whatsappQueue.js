@@ -7,22 +7,40 @@ const logger = require("./logger");
 const AutoWhatsApp = require("./autoWhatsApp");
 const statusUpdateQueue = require('./statusUpdateQueue');
 const args = [
-    '--headless',  
+    // '--headless',  
     'disable-extensions', 'no-sandbox',
     "proxy-server='direct://'", 'proxy-bypass-list=*',
     'start-maximized', 'disable-gpu', '--disable-dev-shm-usage',
     "window-size=1920,1080",
     'user-agent=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
     'allow-running-insecure-content', 'ignore-certificate-errors', 
-    `user-data-dir=${process.env.USER_DATA_DIR}`
 ]
 
 let auto;
-auto = process.env.BROWSER_TYPE === 'chrome' ? new AutoWhatsApp(args, 'chrome', process.env.USER_DATA_DIR) 
-  : new AutoWhatsApp([], 'firefox', process.env.USER_DATA_DIR);
+
+if(process.env.BROWSER_TYPE === 'chrome'){
+  auto = new AutoWhatsApp(args, 'chrome', process.env.CHROME_DATA_DIR);
+  (async () => {
+    await auto.chromeInit();
+  })();
+}
+
+if(process.env.BROWSER_TYPE === 'edge'){
+  auto = new AutoWhatsApp(args, 'MicrosoftEdge', process.env.EDGE_DATA_DIR);
+  (async () => {
+    await auto.edgeInit();
+  })();
+}
+
+if(process.env.BROWSER_TYPE === 'firefox'){
+  auto = new AutoWhatsApp([], 'firefox', process.env.FIREFOX_DATA_DIR);
+  (async () => {
+    await auto.firefoxInit();
+  })();
+}
+
 (async () => {
   try {
-    process.env.BROWSER_TYPE === 'chrome' ? await auto.chromeInit() : await auto.firefoxInit();
     await auto.driver.get("https://www.google.com")
     .then(() => console.log("Opened Google"))
     .catch(err => console.log(err))
