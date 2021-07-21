@@ -141,8 +141,10 @@ class AutoWhatsapp {
         } catch (error) {
             await Promise.reject(error)
         } finally {
-            await this.driver.close();
-            await this.driver.switchTo().window(baseWindowHandle);
+            setTimeout(async() => {
+                await this.driver.close();
+                await this.driver.switchTo().window(baseWindowHandle);
+            }, 1350);
         }
         
         await Promise.resolve();

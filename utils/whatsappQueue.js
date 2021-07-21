@@ -7,7 +7,7 @@ const logger = require("./logger");
 const AutoWhatsApp = require("./autoWhatsApp");
 const statusUpdateQueue = require('./statusUpdateQueue');
 const args = [
-    '--headless',  
+    // '--headless',  
     'disable-extensions', 'no-sandbox',
     "proxy-server='direct://'", 'proxy-bypass-list=*',
     'start-maximized', 'disable-gpu', '--disable-dev-shm-usage',
