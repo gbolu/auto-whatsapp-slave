@@ -49,7 +49,7 @@ if(process.env.BROWSER_TYPE === 'firefox'){
   }
 })();
 
-const whatsappQueue = new Queue("whatsapp", {
+const whatsappQueue = new Queue(`whatsapp-${process.env.BROWSER_TYPE}`, {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
   settings: {
     drainDelay: 500,
