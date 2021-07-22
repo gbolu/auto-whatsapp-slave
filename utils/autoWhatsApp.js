@@ -138,16 +138,23 @@ class AutoWhatsapp {
                 else
                 throw Error("Failed to send message!");
             }
+
+           await this.driver.sleep(1350)
+           .then(async() => {
+               await this.driver.close();
+               await this.driver.switchTo().window(baseWindowHandle);
+           })
+           .catch(err => console.log(err));
+           await Promise.resolve();
         } catch (error) {
-            await Promise.reject(error)
-        } finally {
-            setTimeout(async() => {
-                await this.driver.close();
-                await this.driver.switchTo().window(baseWindowHandle);
-            }, 1350);
-        }
+            await this.driver.sleep(1350)
+           .then(async() => {
+               await this.driver.close();
+               await this.driver.switchTo().window(baseWindowHandle);
+           });
+            await Promise.reject(error);
+        } 
         
-        await Promise.resolve();
     }
 }
 

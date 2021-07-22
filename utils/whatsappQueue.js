@@ -39,17 +39,7 @@ if(process.env.BROWSER_TYPE === 'firefox'){
   })();
 }
 
-(async () => {
-  try {
-    await auto.driver.get("https://www.google.com")
-    .then(() => console.log("Opened Google"))
-    .catch(err => console.log(err))
-  } catch (error) {
-    console.log(error);
-  }
-})();
-
-const whatsappQueue = new Queue(`whatsapp-${process.env.BROWSER_TYPE}`, {
+const whatsappQueue = new Queue(`whatsapp-${process.env.BROWSER_TYPE}-${process.env.PORT}`, {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
   settings: {
     drainDelay: 500,
@@ -57,6 +47,10 @@ const whatsappQueue = new Queue(`whatsapp-${process.env.BROWSER_TYPE}`, {
     maxStalledCount: 0,
     stalledInterval: 0,
   },
+  defaultJobOptions: {
+    removeOnComplete: true, 
+    delay: 0
+  }
 });
 
 // ncrease the max listeners to get rid of the warning below
@@ -86,21 +80,23 @@ activeQueues.forEach((handler) => {
           logger.info(`Sending failed status message...`)
           await statusUpdateQueue.add({id: job.data.id, status: "failed"}, {attempts: 3});   
           await job.discard();
+
           if(await queue.isPaused())
           await queue.resume();
-          return;
         } catch (error) {
           throw Error(`An error occurred sending a status message for job with id: ${job.data.id}.`)
         }
       } else {
         await job.remove();
+
         if(await queue.isPaused())
         await queue.resume();
-        await queue.add(job.data, {delay: 10000});
+
+        await queue.add(job.data, {lifo: true});
       }
 
     } catch (error) {
-      console.log(error.message)
+      logger.error(error.message)
     }
   });
 
@@ -115,12 +111,12 @@ activeQueues.forEach((handler) => {
       if(await queue.isPaused())
       await queue.resume();  
     } catch (error) {
-      console.error(error)
+      logger.error(error)
     }
   });
 
   queue.on("stalled", async(job) => {
-    console.log(`Whatsapp Queue is stalled on job: ${job.id}`);
+    logger.info(`Whatsapp Queue is stalled on job: ${job.id}`);
     
     if(!await job.isActive())
     await job.remove();
@@ -130,13 +126,13 @@ activeQueues.forEach((handler) => {
   })
 
   queue.on("waiting", async (job) => {
-    console.log("Waiting at the moment on job: " + job);
+    logger.info("Waiting at the moment on job: " + job);
     if(await queue.isPaused())
     await queue.resume();
   });
 
   queue.on("active", async (job) => {
-    console.log(`Job: ${job.id} has started.`);
+    logger.info(`Job: ${job.id} has started.`);
     await queue.pause();
   });
 
@@ -145,14 +141,14 @@ activeQueues.forEach((handler) => {
     // KeepAliveTimer.start();
   });
 
-  queue.on("paused", () => console.log(`Whatsapp Queue has paused.`));
+  queue.on("paused", () => logger.info(`Whatsapp Queue has paused.`));
   queue.on("resumed", async () => {
-    console.log("Whatsapp Queue has resumed.")
+    logger.info("Whatsapp Queue has resumed.")
     // await emptyHandler();
   });
 
   queue.on("error", (err) => {
-    console.log(err)
+    logger.info(err)
   });
 
   // link the correspondant processor/worker
@@ -161,7 +157,7 @@ activeQueues.forEach((handler) => {
 
     return auto.sendMessage(phone_number, message)
       .then(() => {
-        console.log('Job done!');
+        logger.info('Job done!');
         return statusUpdateQueue.add({id, status: "successful"}, {attempts: 3, removeOnComplete: true})
         .then(() => {
           return Promise.resolve();

@@ -2,6 +2,7 @@ require('dotenv').config();
 const { createServer } = require('http');
 const app = require('./app');
 const cleanWhatsappQueue = require('./utils/cleanWhatsappQueue');
+const whatsappQueue = require('./utils/whatsappQueue');
 
 // HANDLING UNCAUGHT EXCEPTION ERRORS
 process.on('uncaughtException', (err) => {
@@ -30,6 +31,11 @@ server.listen(port, () => {
 process.on('unhandledRejection', (err) => {
   console.error(err.name, err.message);
   console.log('UNHANDLED REJECTION! 😞 Shutting down Server...');
+
+  whatsappQueue.close()
+  .then((console.log('WhatsApp Queue has been closed...')))
+  .catch(err => console.log(err));
+  
   server.close(() => {
     process.exit(1);
   });
