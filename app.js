@@ -33,7 +33,7 @@ app.post('/addJob', async (req, res) => {
   });
 })
 
-app.get('/isAvailable', async (req, res, next) => {
+app.get('/queue/isAvailable', async (req, res, next) => {
   let isAvailable = false;
 
   if((await whatsappQueue.getActiveCount()) === 0)
@@ -46,6 +46,14 @@ app.get('/isAvailable', async (req, res, next) => {
         isAvailable
       },
       message: `Slave server: ${req.protocol + '://' + req.get('host')} status retrieved.`
+  });
+})
+
+app.get('/queue/count', async (req, res, next) => {
+  let count = await whatsappQueue.count();
+  
+  return res.status(200).json({
+    count
   });
 })
 
