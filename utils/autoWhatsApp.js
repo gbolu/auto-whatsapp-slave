@@ -139,7 +139,7 @@ class AutoWhatsapp {
                 throw Error("Failed to send message!");
             }
 
-           await this.driver.sleep(1350)
+           await this.driver.sleep(2000)
            .then(async() => {
                await this.driver.close();
                await this.driver.switchTo().window(baseWindowHandle);
@@ -147,7 +147,7 @@ class AutoWhatsapp {
            .catch(err => console.log(err));
            await Promise.resolve();
         } catch (error) {
-            await this.driver.sleep(1350)
+            await this.driver.sleep(2000)
            .then(async() => {
                await this.driver.close();
                await this.driver.switchTo().window(baseWindowHandle);
