@@ -4,40 +4,8 @@ const Queue = require('bull');
 const EventEmitter = require("events");
 const logger = require("./logger");
 
-const AutoWhatsApp = require("./autoWhatsApp");
 const statusUpdateQueue = require('./statusUpdateQueue');
-const args = [
-    '--headless',  
-    'disable-extensions', 'no-sandbox',
-    "proxy-server='direct://'", 'proxy-bypass-list=*',
-    'start-maximized', 'disable-gpu', '--disable-dev-shm-usage',
-    "window-size=1920,1080",
-    'user-agent=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-    'allow-running-insecure-content', 'ignore-certificate-errors', 
-]
-
-let auto;
-
-if(process.env.BROWSER_TYPE === 'chrome'){
-  auto = new AutoWhatsApp(args, 'chrome', process.env.CHROME_DATA_DIR);
-  (async () => {
-    await auto.chromeInit();
-  })();
-}
-
-if(process.env.BROWSER_TYPE === 'edge'){
-  auto = new AutoWhatsApp(args, 'MicrosoftEdge', process.env.EDGE_DATA_DIR);
-  (async () => {
-    await auto.edgeInit();
-  })();
-}
-
-if(process.env.BROWSER_TYPE === 'firefox'){
-  auto = new AutoWhatsApp([], 'firefox', process.env.FIREFOX_DATA_DIR);
-  (async () => {
-    await auto.firefoxInit();
-  })();
-}
+const autoWhatsAppProcessor = require('./processor');
 
 const whatsappQueue = new Queue(`whatsapp-${process.env.BROWSER_TYPE}-${process.env.PORT}`, {
   redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
@@ -136,11 +104,6 @@ activeQueues.forEach((handler) => {
     await queue.pause();
   });
 
-  queue.on("empty", async () => {
-    // logger.info(`Starting timer to keep WhatsApp alive...`);
-    // KeepAliveTimer.start();
-  });
-
   queue.on("paused", () => logger.info(`Whatsapp Queue has paused.`));
   queue.on("resumed", async () => {
     logger.info("Whatsapp Queue has resumed.")
@@ -152,26 +115,9 @@ activeQueues.forEach((handler) => {
   });
 
   // link the correspondant processor/worker
-  queue.process(1, function(job) {
-    const { id, message, phone_number } = job.data;
+  queue.process(1, autoWhatsAppProcessor); 
 
-    return auto.sendMessage(phone_number, message)
-      .then(() => {
-        logger.info('Job done!');
-        return statusUpdateQueue.add({id, status: "successful"}, {attempts: 3, removeOnComplete: true})
-        .then(() => {
-          return Promise.resolve();
-        })
-        .catch(err => {
-          throw new Error(err);
-        })
-      })
-      .catch(err => {
-        throw new Error(err);
-      });
-}); 
-
-  logger.info(`Processing ${queue.name}-${process.env.BROWSER_TYPE}...`);
+  logger.info(`Processing ${queue.name}...`);
 });
 
 module.exports = whatsappQueue;
