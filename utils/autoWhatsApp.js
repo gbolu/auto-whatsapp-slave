@@ -51,7 +51,7 @@ class AutoWhatsapp {
             this.driver = driver;
             console.log(`Created Selenium driver for chrome...`);
         } catch (error) {
-            throw new Error(err);
+            throw new Error(error);
         }
     }
 
