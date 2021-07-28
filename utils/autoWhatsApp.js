@@ -141,6 +141,9 @@ class AutoWhatsapp {
         } catch (error) {
             await Promise.reject(error);
         } finally {            
+            if(process.env.SERVER_TYPE.toUpperCase() === "BACKUP"){
+                await this.driver.sleep(1850);
+            }
             await this.driver.close();
             await this.driver.switchTo().window(baseWindowHandle);
         }   
