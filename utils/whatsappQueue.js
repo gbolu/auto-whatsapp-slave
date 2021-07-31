@@ -8,7 +8,7 @@ const statusUpdateQueue = require('./statusUpdateQueue');
 const autoWhatsAppProcessor = require('./processor');
 
 const whatsappQueue = new Queue(`whatsapp-${process.env.BROWSER_TYPE}-${process.env.PORT}`, {
-  redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
+  redis: { port: process.env.REDIS_PORT || 6379, host: process.env.REDIS_HOST },
   settings: {
     drainDelay: 500,
     guardInterval: 500,

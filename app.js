@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('./utils/logger');
 const whatsappQueue = require('./utils/whatsappQueue');
 const app = express();
 app.use(express.json());
@@ -18,7 +19,7 @@ app.post('/addJob', async (req, res) => {
   try {
     await whatsappQueue.add({id, message, phone_number});
   } catch (error) {
-    // console.log(error);
+    logger.error(error);
     return res.status(500).end();
   }
 

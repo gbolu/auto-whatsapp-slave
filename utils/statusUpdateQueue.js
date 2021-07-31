@@ -4,7 +4,7 @@ const axios = require("axios").default;
 const logger = require('./logger');
 
 const statusUpdateQueue = new Queue("statusUpdate", {
-  redis: { port: process.env.REDIS_PORT || 6379, host: "127.0.0.1" },
+  redis: { port: process.env.REDIS_PORT || 6379, host: process.env.REDIS_HOST },
 });
 
 statusUpdateQueue.process(3, (job) => new Promise(async(resolve, reject) => {
@@ -27,7 +27,7 @@ statusUpdateQueue.on("failed", async(job, err) => {
     if(await statusUpdateQueue.isPaused())
     await statusUpdateQueue.resume();
   } catch (error) {
-    console.log(error.message)
+    logger.error(error.message)
   }
 });
 
@@ -37,12 +37,12 @@ statusUpdateQueue.on("completed", async (job) => {
       `Job with messageID: ${job.data.id} and status: ${job.data.status} completed.`
     ); 
   } catch (error) {
-    console.error(error)
+    logger.error(error)
   }
 });
 
 statusUpdateQueue.on("stalled", async(job) => {
-  console.log(`StatusUpdate Queue is stalled on job: ${job.id}`);  
+  logger.info(`StatusUpdate Queue is stalled on job: ${job.id}`);  
   await job.remove();
   await statusUpdateQueue.removeJobs(job.id);
 
@@ -51,7 +51,7 @@ statusUpdateQueue.on("stalled", async(job) => {
 })
 
 statusUpdateQueue.on("error", (err) => {
-  console.log(err)
+  logger.error(err)
 });
 
 module.exports = statusUpdateQueue;

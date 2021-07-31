@@ -3,7 +3,7 @@ const statusUpdateQueue = require('./statusUpdateQueue');
 const logger = require('./logger');
 
 const args = [
-    '--headless',  
+    // '--headless',  
     'disable-extensions', 'no-sandbox',
     "proxy-server='direct://'", 'proxy-bypass-list=*',
     'start-maximized', 'disable-gpu', '--disable-dev-shm-usage',
