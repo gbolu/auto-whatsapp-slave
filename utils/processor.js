@@ -2,8 +2,7 @@ const AutoWhatsApp = require("./autoWhatsApp");
 const statusUpdateQueue = require('./statusUpdateQueue');
 const logger = require('./logger');
 
-const args = [
-    // '--headless',  
+let args = [
     'disable-extensions', 'no-sandbox',
     "proxy-server='direct://'", 'proxy-bypass-list=*',
     'start-maximized', 'disable-gpu', '--disable-dev-shm-usage',
@@ -11,6 +10,9 @@ const args = [
     'user-agent=User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
     'allow-running-insecure-content', 'ignore-certificate-errors', 
 ]
+if (process.env.NODE_ENV === "production"){
+  args = ['--headless', ...args]
+}  
 
 let auto;
 
