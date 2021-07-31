@@ -161,32 +161,36 @@ class AutoWhatsapp {
       
       //  the chat body.
       if (process.env.MODE === "beta"){
-        const chatBoxElement = await this.driver.findElement(
-          By.xpath("/html/body/div/div[1]/div[1]/div[4]")
-        );
-  
-        //  right click on chat body to bring up context menu
-        const tAction = this.driver.actions();
-        await tAction
-          .move({ duration: 50, origin: chatBoxElement, x: -10, y: -50 })
-          .perform();
-        await tAction.contextClick().perform();
-  
-        //  scroll to delete
-        for (let i = 0; i < 5; i++) {
-          await tAction.sendKeys(Key.ARROW_DOWN).perform();
-        }
-        await tAction.sendKeys(Key.ENTER).perform();
-  
-        // confirmation modal continue button
-        const continueButton = await this.driver.findElement(
-          By.xpath(
-            "/html/body/div/div[1]/span[2]/div[1]/div/div/div/div/div/div[3]/div[2]"
-          )
-        );
-  
-        await this.driver.wait(until.elementIsEnabled(continueButton));
-        await tAction.click(continueButton).perform();
+        try {
+          const chatBoxElement = await this.driver.findElement(
+            By.xpath("/html/body/div/div[1]/div[1]/div[4]")
+          );
+    
+          //  right click on chat body to bring up context menu
+          const tAction = this.driver.actions();
+          await tAction
+            .move({ duration: 50, origin: chatBoxElement, x: -10, y: -50 })
+            .perform();
+          await tAction.contextClick().perform();
+    
+          //  scroll to delete
+          for (let i = 0; i < 5; i++) {
+            await tAction.sendKeys(Key.ARROW_DOWN).perform();
+          }
+          await tAction.sendKeys(Key.ENTER).perform();
+    
+          // confirmation modal continue button
+          const continueButton = await this.driver.findElement(
+            By.xpath(
+              "/html/body/div/div[1]/span[2]/div[1]/div/div/div/div/div/div[3]/div[2]"
+            )
+          );
+    
+          await this.driver.wait(until.elementIsEnabled(continueButton));
+          await tAction.click(continueButton).perform();
+        } catch (error) {
+          console.log(error);
+        }     
       }
     } catch (error) {
       logger.error(error);
