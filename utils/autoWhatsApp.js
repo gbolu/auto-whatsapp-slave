@@ -5,7 +5,6 @@ const edge = require('selenium-webdriver/edge');
 const path = require('path');
 const rimraf = require('rimraf');
 const logger  = require("./logger");
-const emojiToUnicode = require('./emojiUnicode');
 
 class AutoWhatsapp {
   /**
