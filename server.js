@@ -8,7 +8,7 @@ const whatsappQueue = require('./utils/whatsappQueue');
 // HANDLING UNCAUGHT EXCEPTION ERRORS
 process.on('uncaughtException', (err) => {
   logger.info('UNCAUGHT EXCEPTION! 🙄 Shutting down...');
-  logger.error(err.name, err.message);
+  logger.error(err);
   process.exit(1);
 });
 

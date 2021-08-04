@@ -5,6 +5,8 @@ const edge = require('selenium-webdriver/edge');
 const path = require('path');
 const rimraf = require('rimraf');
 const logger  = require("./logger");
+const emojiToUnicode = require('./emojiUnicode');
+
 class AutoWhatsapp {
   /**
    * @param {Array<String>} browser_options_args
@@ -128,10 +130,19 @@ class AutoWhatsapp {
             "/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[1]/div/div[2]"
           )
         ),
-        30000
+        40000
       );
 
       for (let text of messages) {
+        //  regex used to check for emojis
+        const emojiRegexExp =
+          /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/gi;
+
+        //  check for the presence of emojis in text
+        let emojiRegexTestResults = emojiRegexExp.exec(text);
+        if (emojiRegexTestResults != null) 
+        throw new Error("Emojis are not allowed.");
+
         //  add text to text field
         await textElement.sendKeys(text);
 
@@ -142,7 +153,7 @@ class AutoWhatsapp {
               "/html/body/div/div[1]/div[1]/div[4]/div[1]/footer/div[1]/div[2]/div/div[2]/button"
             )
           ),
-          30000
+          40000
         );
         await clickButtonElement.click();
       }
