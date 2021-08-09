@@ -7,7 +7,7 @@ const rimraf = require('rimraf');
 const logger  = require("./logger");
 const AppError = require('./appError');
 
-class AutoWhatsapp {
+class AnonMessenger {
   /**
    * @param {Array<String>} browser_options_args
    */
@@ -98,28 +98,38 @@ class AutoWhatsapp {
     })
   }
 
-  async sendMessage(phone_number = "2348186511634", message = "") {
+  async #navigateTo(link) {
+    let windowHandles;
+    let baseWindowHandle;
+    let targetWindowHandle;
+
+    await this.driver.executeScript(
+      `window.open('${link}')`
+    );
+    windowHandles = await this.driver.getAllWindowHandles();
+    baseWindowHandle = await this.driver.getWindowHandle();
+    targetWindowHandle = windowHandles.filter(
+      (windowHandle) => windowHandle != baseWindowHandle
+    )[0];
+    await this.driver.switchTo().window(targetWindowHandle);
+
+    return baseWindowHandle;
+  }
+
+  async sendWhatsAppMessage(phone_number = "2348186511634", message = "") {
     //  split message by new line character
     let messages = message.split("\n");
 
     //  remove empty characters from message
     messages = messages.filter((message) => message !== "");
 
-    let windowHandles;
     let baseWindowHandle;
-    let targetWindowHandle;
 
     //  navigate to the whatsapp web webpage in a new tab
     try {
-      await this.driver.executeScript(
-        `window.open('https://web.whatsapp.com/send?phone=${phone_number}')`
+      baseWindowHandle = await this.#navigateTo(
+        `https://web.whatsapp.com/send?phone=${phone_number}`
       );
-      windowHandles = await this.driver.getAllWindowHandles();
-      baseWindowHandle = await this.driver.getWindowHandle();
-      targetWindowHandle = windowHandles.filter(
-        (windowHandle) => windowHandle != baseWindowHandle
-      )[0];
-      await this.driver.switchTo().window(targetWindowHandle);
 
       //  select text field used to input messages
       let textElement = await this.driver.wait(
@@ -157,7 +167,7 @@ class AutoWhatsapp {
 
       //  wait for messagesto successfully be processed and delivered
       
-      await this.driver.sleep(process.env.MODE === "beta" ? 1300 : 700);
+      await this.driver.sleep(process.env.MODE === "beta" ? 1300 : 1100);
       
       //  the chat body.
       if (process.env.MODE === "beta"){
@@ -201,6 +211,10 @@ class AutoWhatsapp {
       await this.driver.switchTo().window(baseWindowHandle);
     }
   }
+
+  async sendTextMessage(phone_number, message) {
+
+  }
 }
 
-module.exports = AutoWhatsapp;
+module.exports = AnonMessenger;

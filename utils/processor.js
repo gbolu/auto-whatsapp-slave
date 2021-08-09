@@ -40,17 +40,20 @@ if(process.env.BROWSER_TYPE === 'firefox'){
 const autoWhatsAppProcessor = function(job, done) {
   const { id, message, phone_number } = job.data;
 
-  return auto.
-    validateMessage(message)
-    .then(_ => auto.sendMessage(phone_number, message))
+  return auto
+    .validateMessage(message)
+    .then((_) => auto.sendWhatsAppMessage(phone_number, message))
     .then(() => {
-      logger.info('Job done!');
-      return statusUpdateQueue.add({id, status: "successful"}, {attempts: 3, removeOnComplete: true})
+      logger.info("Job done!");
+      return statusUpdateQueue.add(
+        { id, status: "successful" },
+        { attempts: 3, removeOnComplete: true }
+      );
     })
     .then(() => {
       done(null);
     })
-    .catch(err => {
+    .catch((err) => {
       done(err);
     });
 }
