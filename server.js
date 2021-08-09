@@ -32,12 +32,10 @@ server.listen(port, () => {
 process.on('unhandledRejection', (err) => {
   logger.error(err.name, err.message);
   logger.error('UNHANDLED REJECTION! 😞 Shutting down Server...');
-
-  whatsappQueue.close()
-  .then((logger.info('WhatsApp Queue has been closed...')))
-  .catch(err => logger.error(err));
-  
-  server.close(() => {
+ 
+  server.close(async () => {
+    await whatsappQueue.close();
+    logger.info("WhatsApp Queue closed...");
     process.exit(1);
   });
 });

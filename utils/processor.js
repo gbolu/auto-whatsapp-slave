@@ -42,15 +42,13 @@ const autoWhatsAppProcessor = function(job, done) {
 
   return auto.
     validateMessage(message)
-    .then(_ => {
-      auto.sendMessage(phone_number, message)
-      .then(() => {
-        logger.info('Job done!');
-        return statusUpdateQueue.add({id, status: "successful"}, {attempts: 3, removeOnComplete: true})
-        .then(() => {
-          done(null);
-        })
-      })
+    .then(_ => auto.sendMessage(phone_number, message))
+    .then(() => {
+      logger.info('Job done!');
+      return statusUpdateQueue.add({id, status: "successful"}, {attempts: 3, removeOnComplete: true})
+    })
+    .then(() => {
+      done(null);
     })
     .catch(err => {
       done(err);

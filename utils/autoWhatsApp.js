@@ -21,27 +21,6 @@ class AutoWhatsapp {
     this.browser_options_args.push(`user-data-dir=${this.user_data_dir}`);
     let chromeOptions = new chrome.Options();
 
-    rimraf(path.resolve(this.user_data_dir, "Local State"), (err) => {
-      if (err) {
-        logger.error(err);
-        return;
-      }
-
-      logger.info(`Removed Local State folder.`);
-    });
-
-    rimraf(
-      path.resolve(this.user_data_dir, "Default", "Preferences"),
-      (err) => {
-        if (err) {
-          logger.error(err);
-          return;
-        }
-
-        logger.info(`Removed Default Preferences folder..`);
-      }
-    );
-
     for (let arg of this.browser_options_args) {
       chromeOptions.addArguments(arg);
     }
@@ -112,9 +91,9 @@ class AutoWhatsapp {
         //  check for the presence of emojis in text
         let emojiRegexTestResults = emojiRegexExp.exec(text);
         if (emojiRegexTestResults != null) 
-        reject(new AppError("Emojis are not allowed.", "ValidationError"));
+        reject(new AppError("Emojis are not allowed.", ));
       })
-      
+
       resolve(null);
     })
   }
@@ -153,15 +132,6 @@ class AutoWhatsapp {
       );
 
       for (let text of messages) {
-        //  regex used to check for emojis
-        const emojiRegexExp =
-          /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/gi;
-
-        //  check for the presence of emojis in text
-        let emojiRegexTestResults = emojiRegexExp.exec(text);
-        if (emojiRegexTestResults != null) 
-        throw new Error("Emojis are not allowed.");
-
         //  add text to text field
         await textElement.sendKeys(text);
 
