@@ -40,29 +40,30 @@ activeQueues.forEach((handler) => {
     try {
       logger.error(err);
 
-      //  retry job if error up to 3 attempts
-      job.data.attemptsMade ? job.data.attemptsMade += 1 : job.data.attemptsMade = 1
-
-      if(job.data.attemptsMade === 3){
-        try {
-          logger.info(`Sending failed status message...`)
-          await statusUpdateQueue.add({id: job.data.id, status: "failed"}, {attempts: 3});   
-          await job.discard();
-
+      if(err.name !== "ValidationError"){
+        //  retry job if error up to 3 attempts
+        job.data.attemptsMade ? job.data.attemptsMade += 1 : job.data.attemptsMade = 1
+  
+        if(job.data.attemptsMade === 3){
+          try {
+            logger.info(`Sending failed status message...`)
+            await statusUpdateQueue.add({id: job.data.id, status: "failed"}, {attempts: 3});   
+            await job.discard();
+  
+            if(await queue.isPaused())
+            await queue.resume();
+          } catch (error) {
+            throw Error(`An error occurred sending a status message for job with id: ${job.data.id}.`)
+          }
+        } else {
+          await job.remove();
+  
           if(await queue.isPaused())
           await queue.resume();
-        } catch (error) {
-          throw Error(`An error occurred sending a status message for job with id: ${job.data.id}.`)
+  
+          await queue.add(job.data, {lifo: true});
         }
-      } else {
-        await job.remove();
-
-        if(await queue.isPaused())
-        await queue.resume();
-
-        await queue.add(job.data, {lifo: true});
       }
-
     } catch (error) {
       logger.error(error.message)
     }

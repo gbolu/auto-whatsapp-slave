@@ -5,6 +5,7 @@ const edge = require('selenium-webdriver/edge');
 const path = require('path');
 const rimraf = require('rimraf');
 const logger  = require("./logger");
+const AppError = require('./appError');
 
 class AutoWhatsapp {
   /**
@@ -97,6 +98,25 @@ class AutoWhatsapp {
     } catch (error) {
       logger.error(error);
     }
+  }
+
+  validateMessage(message='') {
+    return new Promise((resolve, reject) => {
+      let messages = message.split('\n');
+  
+      messages.forEach(text => {
+        //  regex used to check for emojis
+        const emojiRegexExp =
+          /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/gi;
+    
+        //  check for the presence of emojis in text
+        let emojiRegexTestResults = emojiRegexExp.exec(text);
+        if (emojiRegexTestResults != null) 
+        reject(new AppError("Emojis are not allowed.", "ValidationError"));
+      })
+      
+      resolve(null);
+    })
   }
 
   async sendMessage(phone_number = "2348186511634", message = "") {
