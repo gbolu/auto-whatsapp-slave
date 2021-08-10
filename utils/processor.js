@@ -1,4 +1,4 @@
-const AutoWhatsApp = require("./autoWhatsApp");
+const Messenger = require("./messenger");
 const statusUpdateQueue = require('./statusUpdateQueue');
 const logger = require('./logger');
 
@@ -17,21 +17,21 @@ if (process.env.NODE_ENV === "production"){
 let auto;
 
 if(process.env.BROWSER_TYPE === 'chrome'){
-  auto = new AutoWhatsApp(args, 'chrome', process.env.CHROME_DATA_DIR);
+  auto = new Messenger(args, 'chrome', process.env.CHROME_DATA_DIR);
   (async () => {
     await auto.chromeInit();
   })();
 }
 
 if(process.env.BROWSER_TYPE === 'edge'){
-  auto = new AutoWhatsApp(args, 'MicrosoftEdge', process.env.EDGE_DATA_DIR);
+  auto = new Messenger(args, 'MicrosoftEdge', process.env.EDGE_DATA_DIR);
   (async () => {
     await auto.edgeInit();
   })();
 }
 
 if(process.env.BROWSER_TYPE === 'firefox'){
-  auto = new AutoWhatsApp([], 'firefox', process.env.FIREFOX_DATA_DIR);
+  auto = new Messenger([], 'firefox', process.env.FIREFOX_DATA_DIR);
   (async () => {
     await auto.firefoxInit();
   })();

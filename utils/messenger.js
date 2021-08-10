@@ -2,12 +2,10 @@ const { Builder, Capabilities, until, By, Key } = require("selenium-webdriver");
 const chrome = require('selenium-webdriver/chrome');
 const firefox = require('selenium-webdriver/firefox');
 const edge = require('selenium-webdriver/edge');
-const path = require('path');
-const rimraf = require('rimraf');
 const logger  = require("./logger");
 const AppError = require('./appError');
 
-class AnonMessenger {
+class Messenger {
   /**
    * @param {Array<String>} browser_options_args
    */
@@ -116,7 +114,7 @@ class AnonMessenger {
     return baseWindowHandle;
   }
 
-  async sendWhatsAppMessage(phone_number = "2348186511634", message = "") {
+  async sendWhatsAppMessage(phone_number = "", message = "") {
     //  split message by new line character
     let messages = message.split("\n");
 
@@ -212,9 +210,121 @@ class AnonMessenger {
     }
   }
 
-  async sendTextMessage(phone_number, message) {
+  async sendTextMessage(phone_number="", message="") {
+    let messages = message.split('\n');
 
+    let baseWindowHandle;
+    try {
+      baseWindowHandle = await this.#navigateTo(
+        `https://messages.google.com/web`
+      );
+
+      //  find the "Start Chat" Button
+      const startChatButton = await this.driver.wait(until.elementLocated(
+        By.xpath(
+          "/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-main-nav/div/mw-fab-link/a/span[1]/div[2]"
+      )), 40000);
+
+      await startChatButton.click();
+
+      //  find phone number text field
+      const phoneNumberField = await this.driver.wait(
+        until.elementLocated(
+          By.xpath(
+            "/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-new-conversation-container/mw-new-conversation-sub-header/div/div[2]/mw-contact-chips-input/div/mat-chip-list/div/input"
+          )
+        ),
+        40000
+      );
+      await phoneNumberField.sendKeys(phone_number);
+
+      const textField = await this.driver.wait(until.elementLocated(
+        By.xpath("/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div/div[1]/div/mws-message-compose/div/div[2]/div/mws-autosize-textarea/textarea")
+      ));
+
+      for (let text of messages) {
+        //  add text to text field
+        await textField.sendKeys(text);
+
+        //  find the send button
+        const sendButton = await this.driver.wait(
+          until.elementLocated(
+            By.xpath(
+              "/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div/div[1]/div/mws-message-compose/div/mws-message-send-button/div/mw-message-send-button/button"
+            )
+          ), 40000
+        );
+
+        //  click send button
+        await sendButton.click();
+      } 
+
+      //  check that message was sent
+      const contentBox = await this.driver.wait(
+        until.elementLocated(
+          By.xpath(
+            "/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-conversation-container/div/div[1]/div/mws-messages-list/mws-bottom-anchored/div/div/div"
+          )
+        ), 2000
+      );
+
+      messages = message.replace("\n", "");
+      let source = await this.driver.getPageSource();
+
+      for (let messageText of messages) {
+        if (!source.includes(messageText)) 
+        throw Error("Failed to send message!");
+      }
+
+      //  delete the message from the history
+      try {
+        (
+          async() => {
+            //  find the dropdown on the first element in the conversations list box
+            const conversationBoxDropdownButton = await this.driver.wait(
+              until.elementLocated(
+                By.xpath(
+                  "/html/body/mw-app/mw-bootstrap/div/main/mw-main-container/div/mw-main-nav/mws-conversations-list/nav/div[1]/mws-conversation-list-item[1]/a/div[3]/mws-conversation-list-item-menu/button"
+              )), 2000
+            );
+            
+            //  click the dropdown button
+            await conversationBoxDropdownButton.click();
+
+            //  find the delete button on the dropdown
+            const deleteButton = await this.driver.wait(
+              until.elementLocated(
+                By.xpath("/html/body/div[6]/div[2]/div/div/div/button[3]")
+              ), 2000
+            );
+            
+            //  click delete button
+            await deleteButton.click();
+
+            const confirmDeleteButton = await this.driver.wait(
+              until.elementLocated(
+                By.xpath(
+                  "/html/body/div[6]/div[3]/div/mat-dialog-container/mws-dialog/div/mat-dialog-actions/button[2]"
+                )
+              ), 2000
+            );
+
+            //  click confirm delete button 
+            await confirmDeleteButton.click();
+          }
+        ) ();  
+      } catch (error) {
+        logger.warn("Could not delete message box...");
+      }
+    } catch (error) {
+      logger.error(error);
+      await Promise.reject(error);
+    } finally {
+      await this.driver.sleep(250);
+      await this.driver.close();
+      await this.driver.switchTo().window(baseWindowHandle);
+    }
   }
 }
 
-module.exports = AnonMessenger;
+module.exports = Messenger;

@@ -4,7 +4,7 @@ const whatsappQueue = require('./utils/whatsappQueue');
 const app = express();
 app.use(express.json());
 
-app.post('/addJob', async (req, res) => {
+app.post('/message/whatsApp', async (req, res) => {
   if(!req.body.message || !req.body.phone_number){
       return res.status(400).json({
           code: res.statusCode,
@@ -33,6 +33,8 @@ app.post('/addJob', async (req, res) => {
     },
   });
 })
+
+app.post('message/text')
 
 app.get('/queue/isAvailable', async (req, res, next) => {
   let isAvailable = false;
