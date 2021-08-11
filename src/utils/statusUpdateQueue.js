@@ -18,31 +18,20 @@ statusUpdateQueue.process(3, (job) => new Promise(async(resolve, reject) => {
     } catch (error) {
       return reject(error);
     }
-
 }));
 
 statusUpdateQueue.on("failed", async(job, err) => {
-  try {
-    logger.error(err);
-    if(await statusUpdateQueue.isPaused())
-    await statusUpdateQueue.resume();
-  } catch (error) {
-    logger.error(error.message)
-  }
+  logger.error(err);
 });
 
-statusUpdateQueue.on("completed", async (job) => {
-  try {
-    logger.info(
-      `Job with messageID: ${job.data.id} and status: ${job.data.status} completed.`
-    ); 
-  } catch (error) {
-    logger.error(error)
-  }
+statusUpdateQueue.on("completed", (job) => {
+  logger.info(
+    `${statusUpdateQueue.name} Job with messageID: ${job.data.id} and status: ${job.data.status} completed.`
+  ); 
 });
 
 statusUpdateQueue.on("stalled", async(job) => {
-  logger.info(`StatusUpdate Queue is stalled on job: ${job.id}`);  
+  logger.info(`${statusUpdateQueue.name} Queue is stalled on job: ${job.id}`);  
   await job.remove();
   await statusUpdateQueue.removeJobs(job.id);
 

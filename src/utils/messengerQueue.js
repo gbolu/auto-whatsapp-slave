@@ -5,9 +5,9 @@ const EventEmitter = require("events");
 const logger = require("./logger");
 
 const statusUpdateQueue = require('./statusUpdateQueue');
-const autoWhatsAppProcessor = require('./processor');
+const messengerProcessor = require('./messengerQueueProcessor');
 
-const whatsappQueue = new Queue(`whatsapp-${process.env.BROWSER_TYPE}-${process.env.PORT}`, {
+const messengerQueue = new Queue(`messenger-${process.env.BROWSER_TYPE}-${process.env.PORT}`, {
   redis: { port: process.env.REDIS_PORT || 6379, host: process.env.REDIS_HOST },
   settings: {
     drainDelay: 500,
@@ -28,7 +28,7 @@ EventEmitter.defaultMaxListeners = 50;
 
 const activeQueues = [
   {
-    queue: whatsappQueue,
+    queue: messengerQueue,
   }
 ];
 
@@ -85,7 +85,7 @@ activeQueues.forEach((handler) => {
   });
 
   queue.on("stalled", async(job) => {
-    logger.info(`Whatsapp Queue is stalled on job: ${job.id}`);
+    logger.info(`${messengerQueue.name} Queue is stalled on job: ${job.id}`);
     
     if(!await job.isActive())
     await job.remove();
@@ -105,9 +105,9 @@ activeQueues.forEach((handler) => {
     await queue.pause();
   });
 
-  queue.on("paused", () => logger.info(`Whatsapp Queue has paused.`));
+  queue.on("paused", () => logger.info(`${messengerQueue.name} Queue has paused.`));
   queue.on("resumed", async () => {
-    logger.info("Whatsapp Queue has resumed.")
+    logger.info(`${messengerQueue.name} Queue has resumed.`)
     // await emptyHandler();
   });
 
@@ -116,9 +116,9 @@ activeQueues.forEach((handler) => {
   });
 
   // link the correspondant processor/worker
-  queue.process(1, autoWhatsAppProcessor); 
+  queue.process(1, messengerProcessor); 
 
   logger.info(`Processing ${queue.name}...`);
 });
 
-module.exports = whatsappQueue;
+module.exports = messengerQueue;

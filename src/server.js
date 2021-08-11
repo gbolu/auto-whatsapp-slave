@@ -1,9 +1,10 @@
 require('dotenv').config();
 const { createServer } = require('http');
 const app = require('./app');
-const cleanWhatsappQueue = require('./utils/cleanWhatsappQueue');
+const cleanQueue = require('./utils/cleanQueue');
 const logger = require('./utils/logger');
-const whatsappQueue = require('./utils/whatsappQueue');
+const messengerQueue = require('./utils/messengerQueue');
+const statusUpdateQueue = require('./utils/statusUpdateQueue');
 
 // HANDLING UNCAUGHT EXCEPTION ERRORS
 process.on('uncaughtException', (err) => {
@@ -18,8 +19,11 @@ const server = createServer(app);
 
 (async () => {
   try {
-    await cleanWhatsappQueue();
-    logger.info("Cleaned AutoWhatsApp Queue...");
+    await cleanQueue(messengerQueue);
+    logger.info(`Cleaned ${messengerQueue.name} Queue...`);
+
+    await cleanQueue(statusUpdateQueue);
+    logger.info(`Cleaned ${statusUpdateQueue.name} Queue...`);
   } catch (error) {
     logger.error(error);
   }
@@ -30,12 +34,12 @@ server.listen(port, () => {
 })
 
 process.on('unhandledRejection', (err) => {
-  logger.error(err.name, err.message);
+  logger.info(err);
   logger.error('UNHANDLED REJECTION! 😞 Shutting down Server...');
  
   server.close(async () => {
-    await whatsappQueue.close();
-    logger.info("WhatsApp Queue closed...");
+    await messengerQueue.close();
+    logger.info(`${messengerQueue.name} Queue closed...`);
     process.exit(1);
   });
 });
